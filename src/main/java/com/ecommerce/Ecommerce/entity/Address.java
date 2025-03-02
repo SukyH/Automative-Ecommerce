@@ -21,8 +21,9 @@ public class Address {
 	
 	private String street;
 	private String city;
+	private String province;
 	private String country;
-	private String zipcode;
+	private String zipCode;
 	
 	
 	@ManyToOne(fetch = FetchType.LAZY)

@@ -33,7 +33,10 @@ public interface EntityMapper {
     OrderDto orderToOrderDto(Order order);
     Order orderDtoToOrder(OrderDto orderDto);
 
-   
+    // Mapping User with Address and Order History
+    @Mapping(target = "orderHistory", source = "orders")
+    @Mapping(target = "address", source = "user.address")
+    UserDto mapUserToDtoPlusAddressAndOrderHistory(User user);
 
 
     // Request Mappings (Request-to-DTO mappings)
