@@ -23,14 +23,21 @@ public class Item {
 	private String name;
 	private String description;
 	private String brand;
-	private String Model;
+	private String model;
 	private String imageUrl;
 	private BigDecimal price;
 	private Integer quantity;
 	
+    private Integer mileage; 
+    private String shape;  
+    private Integer modelYear;  
+    private String vehicleHistory;  
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name= "category_id")
 	private Category category;
+	
+	
 	
 	
 	@Column(name = "created_at")
