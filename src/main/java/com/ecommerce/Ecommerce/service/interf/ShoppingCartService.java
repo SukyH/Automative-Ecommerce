@@ -47,7 +47,9 @@ public class ShoppingCartService {
 
         if (cart == null) {
             cart = new ShoppingCart();
-            cart.setUser(userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found")));
+            cart.setUserId(userRepo.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"))
+                    .getId()); // Extract the ID instead of passing the full User object
             cart.setCreatedAt(LocalDateTime.now());
         }
 
@@ -101,7 +103,7 @@ public class ShoppingCartService {
 
         // Create a new ShoppingCart
         ShoppingCart shoppingCart = new ShoppingCart();
-        shoppingCart.setUser(user);
+        shoppingCart.setUserId(user.getId());
         shoppingCart.setCreatedAt(LocalDateTime.now());
 
         // Save the new cart to the database

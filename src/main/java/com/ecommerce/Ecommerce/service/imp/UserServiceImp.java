@@ -93,6 +93,7 @@ public class UserServiceImp implements UserService {
                 .map(entityMapper::userToUserDto)
                 .toList();
 
+
         return Response.builder()
                 .status(200)
                 .userList(userDtos)
