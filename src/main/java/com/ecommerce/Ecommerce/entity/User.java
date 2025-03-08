@@ -45,7 +45,7 @@ public class User {
 	@OneToMany(mappedBy = "user",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<OrderItem> orderItemList;
 	
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL,mappedBy = "user")
 	private Address Address;
 
 	@Column(name = "created_at")

@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request
                 		//might add later whenwe add admin page
-                		//.requestMatchers("/admin/**").hasRole("ADMIN") 
+                		.requestMatchers("/admin/**").hasRole("ADMIN") 
                         .requestMatchers("/auth/**", "/category/**", "/product/**", "/order/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(manager-> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
