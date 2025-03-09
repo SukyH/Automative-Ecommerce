@@ -24,11 +24,12 @@ public class Category {
 	
 	@Column(unique=true)
 	private String name;
-	
+
+	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Item>  itemList;
 
 	@Column(name = "created_at")
-	private final LocalDateTime createdAt = LocalDateTime.now(); 
+	private final LocalDateTime createdAt = LocalDateTime.now();
 	
 	
 	
