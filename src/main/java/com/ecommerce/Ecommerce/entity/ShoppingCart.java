@@ -17,39 +17,38 @@ public class ShoppingCart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartID;
 
-    @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private Long userId;
 
     @OneToMany(mappedBy = "shoppingCart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<CartItem> cartItems = new HashSet<>();
+    private Set<OrderItem> orderItems = new HashSet<>();
 
     private LocalDateTime createdAt;
 
     public void addItem(Item item, int quantity) {
-        for (CartItem cartItem : cartItems) {
-            if (cartItem.getItem().getVid().equals(item.getVid())) {
-                cartItem.setQuantity(cartItem.getQuantity() + quantity);
+        for (OrderItem OrderItem : orderItems) {
+            if (OrderItem.getItem().getVid().equals(item.getVid())) {
+                OrderItem.setQuantity(OrderItem.getQuantity() + quantity);
                 return;
             }
         }
-        CartItem newCartItem = new CartItem(this, item, quantity);
-        cartItems.add(newCartItem);
+        OrderItem newCartItem = new OrderItem(this, item, quantity);
+        orderItems.add(newCartItem);
     }
 
     public void removeItem(Long itemId) {
-        cartItems.removeIf(cartItem -> cartItem.getItem().getVid().equals(itemId));
+        orderItems.removeIf(cartItem -> cartItem.getItem().getVid().equals(itemId));
     }
 
     public void updateItemQuantity(Long itemId, int quantity) {
-        Iterator<CartItem> iterator = cartItems.iterator();
+        Iterator<OrderItem> iterator = orderItems.iterator();
         while (iterator.hasNext()) {
-            CartItem cartItem = iterator.next();
-            if (cartItem.getItem().getVid().equals(itemId)) {
+            OrderItem orderItem = iterator.next();
+            if (orderItem.getItem().getVid().equals(itemId)) {
                 if (quantity <= 0) {
                     iterator.remove();
                 } else {
-                    cartItem.setQuantity(quantity);
+                    orderItem.setQuantity(quantity);
                 }
                 return;
             }
@@ -57,6 +56,6 @@ public class ShoppingCart {
     }
 
     public void clearItems() {
-        cartItems.clear();
+        orderItems.clear();
     }
 }

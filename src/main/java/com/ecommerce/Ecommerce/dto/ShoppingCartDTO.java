@@ -1,5 +1,6 @@
 package com.ecommerce.Ecommerce.dto;
 
+import com.ecommerce.Ecommerce.entity.OrderItem;
 import lombok.*;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -12,5 +13,5 @@ public class ShoppingCartDTO {
     private Long cartID;
     private Long userId;
     private LocalDateTime createdAt;
-    private Set<ItemDto> cartItems;
+    private Set<OrderItem> orderItems;
 }
