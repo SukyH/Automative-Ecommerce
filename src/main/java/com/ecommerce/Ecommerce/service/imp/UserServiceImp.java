@@ -45,6 +45,7 @@ public class UserServiceImp implements UserService {
                 .name(registrationRequest.getName())
                 .email(registrationRequest.getEmail())
                 .phoneNumber(registrationRequest.getPhoneNumber())
+                .password(passwordEncoder.encode(registrationRequest.getPassword()))
                 .role(role)
                 .build();
 
