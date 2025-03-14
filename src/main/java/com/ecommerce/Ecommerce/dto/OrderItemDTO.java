@@ -11,8 +11,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderItemDTO {
-    private Long id;
-    private Long shoppingCartId;
+    private Long orderitemsid;
+    private Long orderID;
     private Long itemId;
     private int quantity;
 }

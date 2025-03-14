@@ -26,8 +26,8 @@ public interface EntityMapper {
     Item itemDtoToItem(ItemDto itemDto);
 
     // OrderItem Mappings
-    OrderItemDto orderItemToOrderItemDto(OrderItem orderItem);
-    OrderItem orderItemDtoToOrderItem(OrderItemDto orderItemDto);
+    OrderItemDTO orderItemToOrderItemDto(OrderItem orderItem);
+    OrderItem orderItemDtoToOrderItem(OrderItemDTO orderItemDto);
 
     // Order Mappings
     OrderDto orderToOrderDto(Order order);
@@ -57,8 +57,8 @@ public interface EntityMapper {
     List<ItemDto> itemsToItemDtos(List<Item> items);
     List<Item> itemDtosToItems(List<ItemDto> itemDtos);
 
-    List<OrderItemDto> orderItemsToOrderItemDtos(List<OrderItem> orderItems);
-    List<OrderItem> orderItemDtosToOrderItems(List<OrderItemDto> orderItemDtos);
+    List<OrderItemDTO> orderItemsToOrderItemDtos(List<OrderItem> orderItems);
+    List<OrderItem> orderItemDtosToOrderItems(List<OrderItemDTO> orderItemDtos);
 
     // List of Users Mapping (if needed)
     List<UserDto> usersToUserDtos(List<User> users);
