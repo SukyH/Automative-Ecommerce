@@ -1,6 +1,7 @@
 package com.ecommerce.Ecommerce.controller;
 
 import com.ecommerce.Ecommerce.dto.ItemDto;
+import com.ecommerce.Ecommerce.entity.Item;
 import com.ecommerce.Ecommerce.service.interf.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,33 @@ public class ItemController {
     @GetMapping("/items")
     public List<ItemDto> getAllItems() {
         return itemService.getAllItems();
+    }
+    
+    @PostMapping("/items/create")
+    public ItemDto createItem(@RequestBody ItemDto itemDto) {
+        Item item = itemService.createItem(itemDto); // Create item through service
+        return new ItemDto(item.getVid(), item.getName(), item.getDescription(), 
+                           item.getBrand(), item.getModel(), item.getImageUrl(), 
+                           item.getPrice(), item.getQuantity(), null);
+    }
+     
+    @PutMapping("/items/update")
+    public ItemDto updateItem(@RequestBody ItemDto itemDto) {
+        // Update item through service
+        Item item = itemService.updateItem(itemDto);
+
+        // Manually set each field of the ItemDto instead of using a method
+        ItemDto updatedItemDto = new ItemDto();
+        updatedItemDto.setVid(item.getVid());
+        updatedItemDto.setName(item.getName());
+        updatedItemDto.setDescription(item.getDescription());
+        updatedItemDto.setBrand(item.getBrand());
+        updatedItemDto.setModel(item.getModel());
+        updatedItemDto.setImageUrl(item.getImageUrl());
+        updatedItemDto.setPrice(item.getPrice());
+        updatedItemDto.setQuantity(item.getQuantity());
+
+        return updatedItemDto;
     }
 
     @GetMapping("/items/{id}")
