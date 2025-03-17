@@ -1,0 +1,177 @@
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6; /* Adds spacing between lines */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px; /* Increased margin */
+}
+
+table th,
+table td {
+  border: 1px solid #ddd;
+  padding: 12px 15px; /* Added more padding for better readability */
+  text-align: left;
+}
+
+button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px 25px; /* Increased padding */
+  cursor: pointer;
+  border-radius: 5px; /* Added border radius for rounded corners */
+  font-size: 16px; /* Slightly larger font size */
+  transition: background-color 0.3s ease;
+  margin-top: 10px; /* Space above the button */
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.admin-dashboard .dashboard-links {
+  display: flex;
+  gap: 25px; /* Increased gap for better spacing */
+  justify-content: space-between; /* Ensure spacing between items */
+  margin-bottom: 20px; /* Added bottom margin for spacing */
+}
+
+.admin-dashboard .dashboard-links a {
+  text-decoration: none;
+  color: #4CAF50;
+  font-weight: bold;
+  font-size: 16px; /* Increased font size */
+}
+
+.analytics-page .report {
+  margin-bottom: 30px; /* Increased space between reports */
+}
+
+.analytics-page pre {
+  background-color: #f4f4f4;
+  padding: 15px;
+  border-radius: 5px;
+  font-size: 14px; /* Adjusted font size */
+}
+
+.order-management table,
+.vehicle-management table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+}
+
+.order-management button,
+.vehicle-management button {
+  margin-top: 15px; /* Added margin for spacing */
+}
+
+/* Layout */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 30px; /* Added more horizontal padding */
+}
+
+.vehicle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 30px; /* Increased gap between cards */
+}
+
+.vehicle-card {
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 25px; /* Increased padding */
+  border-radius: 10px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.vehicle-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 15px; /* Added margin below image */
+}
+
+.vehicle-card:hover {
+  transform: scale(1.05);
+}
+
+button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 12px 20px; /* Increased padding */
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  margin-top: 15px; /* Added margin to separate from other content */
+}
+
+button:hover {
+  background-color: #d32f2f;
+}
+
+input, select {
+  padding: 12px 15px; /* Increased padding */
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 100%;
+  font-size: 16px; /* Slightly larger font for better readability */
+}
+
+/* Wishlist Page */
+.wishlist-empty {
+  text-align: center;
+  font-size: 1.5rem; /* Slightly larger text */
+  color: #888;
+  margin-top: 40px; /* Added top margin for spacing */
+}
+
+.wishlist-title {
+  font-size: 2.5rem; /* Larger title size */
+  margin-bottom: 30px; /* Increased bottom margin */
+}
+
+/* Loader */
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 2rem;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  font-size: 1.3rem; /* Increased font size */
+}
+
+/* Card Grid */
+.vehicle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 30px; /* Increased gap */
+}

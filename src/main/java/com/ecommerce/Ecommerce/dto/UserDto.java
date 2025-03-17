@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.joda.time.LocalDateTime;
 
-import com.ecommerce.Ecommerce.dto.OrderItemDto;
+import com.ecommerce.Ecommerce.dto.OrderItemDTO;
 import com.ecommerce.Ecommerce.dto.AddressDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -26,8 +26,9 @@ public class UserDto {
 	private String name;
 	private String email;
 	private String phoneNumber;
+	private String password;
 	private String role;
-	private List<OrderItemDto> orderItemList;
+	private List<OrderItemDTO> orderItemList;
 	private AddressDto address;
 
 

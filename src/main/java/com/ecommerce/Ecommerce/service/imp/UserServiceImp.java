@@ -6,6 +6,7 @@ import com.ecommerce.Ecommerce.dto.UserDto;
 import com.ecommerce.Ecommerce.entity.User;
 import com.ecommerce.Ecommerce.enums.UserRole;
 import com.ecommerce.Ecommerce.mapper.EntityMapper;
+
 import com.ecommerce.Ecommerce.repository.UserRepo;
 import com.ecommerce.Ecommerce.security.JwtUtils;
 import com.ecommerce.Ecommerce.service.interf.UserService;
@@ -45,6 +46,7 @@ public class UserServiceImp implements UserService {
                 .name(registrationRequest.getName())
                 .email(registrationRequest.getEmail())
                 .phoneNumber(registrationRequest.getPhoneNumber())
+                .password(passwordEncoder.encode(registrationRequest.getPassword()))
                 .role(role)
                 .build();
 
@@ -92,6 +94,7 @@ public class UserServiceImp implements UserService {
         List<UserDto> userDtos = users.stream()
                 .map(entityMapper::userToUserDto)
                 .toList();
+
 
         return Response.builder()
                 .status(200)

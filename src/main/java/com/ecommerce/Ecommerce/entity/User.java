@@ -1,3 +1,4 @@
+
 package com.ecommerce.Ecommerce.entity;
 import java.util.List;
 
@@ -22,6 +23,10 @@ import com.ecommerce.Ecommerce.entity.Address;
 @NoArgsConstructor
 
 public class User {
+	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Order> orders;
+	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
@@ -42,10 +47,8 @@ public class User {
 	
 	private UserRole role;
 	
-	@OneToMany(mappedBy = "user",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<OrderItem> orderItemList;
 	
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL,mappedBy = "user")
 	private Address Address;
 
 	@Column(name = "created_at")

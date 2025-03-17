@@ -15,7 +15,41 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private ItemRepo itemRepo;
+    
+    
+    @Override
+    public Item createItem(ItemDto itemDto) {
+        // Logic to create item
+        Item item = new Item();
+        item.setName(itemDto.getName());
+        item.setDescription(itemDto.getDescription());
+        item.setBrand(itemDto.getBrand());
+        item.setModel(itemDto.getModel());
+        item.setImageUrl(itemDto.getImageUrl());
+        item.setPrice(itemDto.getPrice());
+        item.setQuantity(itemDto.getQuantity());
+        // Set other fields as needed, then save it to DB
+        return itemRepo.save(item);
+    }
+   
+    @Override
+    public Item updateItem(ItemDto itemDto) {
+        // Fetch existing item from DB
+        Item existingItem = itemRepo.findById(itemDto.getVid()).orElseThrow(() -> new RuntimeException("Item not found"));
 
+        // Update item properties
+        existingItem.setName(itemDto.getName());
+        existingItem.setDescription(itemDto.getDescription());
+        existingItem.setBrand(itemDto.getBrand());
+        existingItem.setModel(itemDto.getModel());
+        existingItem.setImageUrl(itemDto.getImageUrl());
+        existingItem.setPrice(itemDto.getPrice());
+        existingItem.setQuantity(itemDto.getQuantity());
+        // Update other fields as necessary
+
+        // Save updated item to DB
+        return itemRepo.save(existingItem);
+    }
     @Override
     public List<ItemDto> getAllItems() {
         List<Item> items = itemRepo.findAll();

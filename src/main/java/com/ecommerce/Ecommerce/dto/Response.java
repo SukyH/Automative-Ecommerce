@@ -36,8 +36,8 @@ public class Response {
 	private ItemDto item;
 	private List<ItemDto> itemList;
 	
-	private OrderItemDto orderItem;
-	private List<OrderItemDto> orderItemList;
+	private OrderItemDTO orderItem;
+	private List<OrderItemDTO> orderItemList;
 	
 
 }
