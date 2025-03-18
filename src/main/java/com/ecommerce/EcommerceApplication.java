@@ -12,7 +12,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@SpringBootApplication
+
+@SpringBootApplication(scanBasePackages = {"com.ecommerce"})
 public class EcommerceApplication {
 
 public static void main(String[] args) {
