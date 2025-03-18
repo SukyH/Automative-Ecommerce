@@ -27,19 +27,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 public class ItemDto {
-	private Long vid;
-    
-	private String name;
-	private String description;
-	private String brand;
-	private String Model;
-	private String imageUrl;
-	private BigDecimal price;
-	private Integer quantity;
-	
-
-	private CategoryDto category;
-	
+	 private Long vid;
+	    private String name;
+	    private String description;
+	    private String brand;
+	    private String model;
+	    private String imageUrl;
+	    private BigDecimal price;
+	    private Integer quantity;
+	    private Integer mileage; 
+	    private String shape;  
+	    private Integer modelYear;  
+	    private String vehicleHistory;  
 	
 	
 }

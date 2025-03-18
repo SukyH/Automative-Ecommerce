@@ -3,7 +3,7 @@ package com.ecommerce.Ecommerce.controller;
 import com.ecommerce.Ecommerce.dto.ItemDto;
 import com.ecommerce.Ecommerce.entity.Item;
 import com.ecommerce.Ecommerce.service.interf.ItemService;
-import com.ecommerce.Ecommerce.service.AwsS3Service;
+//import com.ecommerce.Ecommerce.service.AwsS3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +18,8 @@ public class ItemController {
     @Autowired
     private ItemService itemService;
 
-    @Autowired
-    private AwsS3Service awsS3Service;
+   // @Autowired
+  //  private AwsS3Service awsS3Service;
 
     // list vehicles in catalog
     @GetMapping("/items")
@@ -30,9 +30,20 @@ public class ItemController {
     @PostMapping("/items/create")
     public ItemDto createItem(@RequestBody ItemDto itemDto) {
         Item item = itemService.createItem(itemDto); // Create item through service
-        return new ItemDto(item.getVid(), item.getName(), item.getDescription(), 
-                           item.getBrand(), item.getModel(), item.getImageUrl(), 
-                           item.getPrice(), item.getQuantity(), null);
+        return new ItemDto(
+                item.getVid(), 
+                item.getName(), 
+                item.getDescription(), 
+                item.getBrand(), 
+                item.getModel(), 
+                item.getImageUrl(), 
+                item.getPrice(), 
+                item.getQuantity(), 
+                item.getMileage(), 
+                item.getShape(),   
+                item.getModelYear(), 
+                item.getVehicleHistory() 
+            );
     }
      
     @PutMapping("/items/update")
@@ -40,18 +51,22 @@ public class ItemController {
         // Update item through service
         Item item = itemService.updateItem(itemDto);
 
-        // Manually set each field of the ItemDto instead of using a method
-        ItemDto updatedItemDto = new ItemDto();
-        updatedItemDto.setVid(item.getVid());
-        updatedItemDto.setName(item.getName());
-        updatedItemDto.setDescription(item.getDescription());
-        updatedItemDto.setBrand(item.getBrand());
-        updatedItemDto.setModel(item.getModel());
-        updatedItemDto.setImageUrl(item.getImageUrl());
-        updatedItemDto.setPrice(item.getPrice());
-        updatedItemDto.setQuantity(item.getQuantity());
+     
 
-        return updatedItemDto;
+        return new ItemDto(
+                item.getVid(),
+                item.getName(),
+                item.getDescription(),
+                item.getBrand(),
+                item.getModel(),
+                item.getImageUrl(),
+                item.getPrice(),
+                item.getQuantity(),
+                item.getMileage(),  // ✅ Added missing fields
+                item.getShape(),
+                item.getModelYear(),
+                item.getVehicleHistory()
+            );
     }
 
     @GetMapping("/items/{id}")
@@ -94,10 +109,10 @@ public class ItemController {
     }
 
     // Upload vehicle image to S3
-    @PostMapping("/items/upload")
-    public ResponseEntity<String> uploadVehicleImage(@RequestParam("file") MultipartFile file) {
-        String imageUrl = awsS3Service.saveImageToS3(file);
-        return ResponseEntity.ok(imageUrl);
-    }
+    //@PostMapping("/items/upload")
+    //public ResponseEntity<String> uploadVehicleImage(@RequestParam("file") MultipartFile file) {
+    //    String imageUrl = awsS3Service.saveImageToS3(file);
+    // ResponseEntity.ok(imageUrl);
+   // }
 }
 

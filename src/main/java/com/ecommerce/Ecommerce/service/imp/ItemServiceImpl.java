@@ -20,14 +20,18 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item createItem(ItemDto itemDto) {
         // Logic to create item
-        Item item = new Item();
-        item.setName(itemDto.getName());
-        item.setDescription(itemDto.getDescription());
-        item.setBrand(itemDto.getBrand());
-        item.setModel(itemDto.getModel());
-        item.setImageUrl(itemDto.getImageUrl());
-        item.setPrice(itemDto.getPrice());
-        item.setQuantity(itemDto.getQuantity());
+    	 Item item = new Item();
+    	    item.setName(itemDto.getName());
+    	    item.setDescription(itemDto.getDescription());
+    	    item.setBrand(itemDto.getBrand());
+    	    item.setModel(itemDto.getModel());
+    	    item.setImageUrl(itemDto.getImageUrl());
+    	    item.setPrice(itemDto.getPrice());
+    	    item.setQuantity(itemDto.getQuantity());
+    	    item.setMileage(itemDto.getMileage()); 
+    	    item.setShape(itemDto.getShape());
+    	    item.setModelYear(itemDto.getModelYear());
+    	    item.setVehicleHistory(itemDto.getVehicleHistory());
         // Set other fields as needed, then save it to DB
         return itemRepo.save(item);
     }
@@ -45,6 +49,10 @@ public class ItemServiceImpl implements ItemService {
         existingItem.setImageUrl(itemDto.getImageUrl());
         existingItem.setPrice(itemDto.getPrice());
         existingItem.setQuantity(itemDto.getQuantity());
+        existingItem.setMileage(itemDto.getMileage()); 
+        existingItem.setShape(itemDto.getShape());  
+        existingItem.setModelYear(itemDto.getModelYear()); 
+        existingItem.setVehicleHistory(itemDto.getVehicleHistory());
         // Update other fields as necessary
 
         // Save updated item to DB
@@ -91,9 +99,20 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private ItemDto convertToDto(Item item) {
-        return new ItemDto(item.getVid(), item.getName(), item.getDescription(), 
-                           item.getBrand(), item.getModel(), item.getImageUrl(), 
-                           item.getPrice(), item.getQuantity(), null);
+        return new ItemDto(
+            item.getVid(), 
+            item.getName(), 
+            item.getDescription(), 
+            item.getBrand(), 
+            item.getModel(), 
+            item.getImageUrl(), 
+            item.getPrice(), 
+            item.getQuantity(), 
+            item.getMileage(),
+            item.getShape(),   
+            item.getModelYear(), 
+            item.getVehicleHistory()
+        );
     }
     
     @Override
