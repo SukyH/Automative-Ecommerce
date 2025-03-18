@@ -1,7 +1,9 @@
 package com.ecommerce.Ecommerce.entity;
 import java.math.BigDecimal;
 
-import org.joda.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDateTime;
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters.LocalDateTimeConverter;
 
 import com.ecommerce.Ecommerce.enums.UserRole;
 
@@ -41,6 +43,8 @@ public class Item {
 	
 	
 	@Column(name = "created_at")
+	@CreationTimestamp
+	@Convert(converter = LocalDateTimeConverter.class)
 	private final LocalDateTime createdAt = LocalDateTime.now(); 
 	
 	
