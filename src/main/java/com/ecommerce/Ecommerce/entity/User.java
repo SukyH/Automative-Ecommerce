@@ -1,8 +1,10 @@
 
 package com.ecommerce.Ecommerce.entity;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import org.joda.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters.LocalDateTimeConverter;
 
 import com.ecommerce.Ecommerce.enums.UserRole;
 
@@ -51,7 +53,11 @@ public class User {
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL,mappedBy = "user")
 	private Address Address;
 
-	@Column(name = "created_at")
-	private final LocalDateTime createdAt = LocalDateTime.now(); 
+	
+    @CreationTimestamp
+	@Column(name = "created_at", nullable = false, updatable = false)
+	@Convert(converter = LocalDateTimeConverter.class)
+	private LocalDateTime createdAt;
+
 	
 }
