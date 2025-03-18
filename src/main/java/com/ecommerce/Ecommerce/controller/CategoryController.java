@@ -34,5 +34,15 @@ public class CategoryController {
     public ResponseEntity<Category> getCategoryById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category category) throws Exception {
+        return ResponseEntity.ok(categoryService.updateCategory(id, category));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteCategory(@PathVariable Long id) throws Exception {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.ok("Category deleted successfully");
+    }
 }
 
