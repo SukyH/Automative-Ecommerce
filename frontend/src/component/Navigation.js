@@ -52,9 +52,8 @@ const Navigation = () => {
           <div>
             <Link to="/">Home</Link>
             <Link to="/catalog">Catalog</Link>
-            <Link to="/hot-deals">Hot Deals</Link>
-            <Link to="/compare">Compare Vehicles</Link>
-            <Link to="/loan-calculator">Loan Calculator</Link>
+
+            
             {isLoggedIn ? (
               <>
                 <Link to="/wishlist">
@@ -99,9 +98,6 @@ const Navigation = () => {
           <div>
             <Link to="/">Home</Link>
             <Link to="/catalog">Catalog</Link>
-            <Link to="/hot-deals">Hot Deals</Link>
-            <Link to="/compare">Compare Vehicles</Link>
-            <Link to="/loan-calculator">Loan Calculator</Link>
             <Link to="/cart">
               <i className="fas fa-shopping-cart"></i> Cart
             </Link>

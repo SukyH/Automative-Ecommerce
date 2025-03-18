@@ -35,49 +35,47 @@ export default class ApiService {
             throw error;  // Re-throw to handle it in other parts of the app
         }
     }
-    
+
     // Wishlist APIs
-static async getWishlist() {
-    try {
-        const response = await axios.get(`${this.BASE_URL}/wishlist`, {
-            headers: this.getHeader(),
+    static async getWishlist() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/wishlist`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (err) {
+            console.error("Error fetching wishlist:", err);
+            throw err;
+        }
+    }
+
+    static async removeFromWishlist(vehicleId) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/wishlist/${vehicleId}`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (err) {
+            console.error("Error removing vehicle from wishlist:", err);
+            throw err;
+        }
+    }
+
+    // Fetch the application usage report 
+    static async getApplicationUsageReport() {
+        const response = await axios.get(`${this.BASE_URL}/usagereport`, {
+            headers: this.getHeader()
         });
         return response.data;
-    } catch (err) {
-        console.error("Error fetching wishlist:", err);
-        throw err;
     }
-}
 
-static async removeFromWishlist(vehicleId) {
-    try {
-        const response = await axios.delete(`${this.BASE_URL}/wishlist/${vehicleId}`, {
-            headers: this.getHeader(),
+    // Fetch the monthly sales report 
+    static async getSalesReport() {
+        const response = await axios.get(`${this.BASE_URL}/salesreport`, {
+            headers: this.getHeader()
         });
         return response.data;
-    } catch (err) {
-        console.error("Error removing vehicle from wishlist:", err);
-        throw err;
     }
-}    
-
-
-// Fetch the application usage report 
-static async getApplicationUsageReport() {
-    const response = await axios.get(`${this.BASE_URL}/usagereport`, {
-      headers: this.getHeader()
-    });
-    return response.data;
-  }
-  
-  // Fetch the monthly sales report 
-  static async getSalesReport() {
-    const response = await axios.get(`${this.BASE_URL}/salesreport`, {
-      headers: this.getHeader()
-    });
-    return response.data;
-  }
-  
 
     /* Authentication and user API */
     static async registerUser(registration) {
@@ -241,6 +239,17 @@ static async getApplicationUsageReport() {
             headers: this.getHeader()
         });
         return response.data;
+    }
+
+    /* Vehicle Image Upload API */
+    static async uploadVehicleImage(formData) {
+        const response = await axios.post(`${this.BASE_URL}/items/upload`, formData, {
+            headers: {
+                ...this.getHeader(),
+                "Content-Type": "multipart/form-data",
+            },
+        });
+        return response.data; // Image URL
     }
 
     /* Authentication checker API */

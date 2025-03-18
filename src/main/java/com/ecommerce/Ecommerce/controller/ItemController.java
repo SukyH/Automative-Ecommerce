@@ -3,8 +3,11 @@ package com.ecommerce.Ecommerce.controller;
 import com.ecommerce.Ecommerce.dto.ItemDto;
 import com.ecommerce.Ecommerce.entity.Item;
 import com.ecommerce.Ecommerce.service.interf.ItemService;
+import com.ecommerce.Ecommerce.service.AwsS3Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,7 +18,10 @@ public class ItemController {
     @Autowired
     private ItemService itemService;
 
-    //list vehicles in catalog
+    @Autowired
+    private AwsS3Service awsS3Service;
+
+    // list vehicles in catalog
     @GetMapping("/items")
     public List<ItemDto> getAllItems() {
         return itemService.getAllItems();
@@ -63,7 +69,7 @@ public class ItemController {
         return itemService.getSortedItemsByPrice(order);
     }
     
- // Sort by Mileage
+    // Sort by Mileage
     @GetMapping("/items/sort/mileage")
     public List<ItemDto> getSortedItemsByMileage(@RequestParam String order) {
         return itemService.getSortedItemsByMileage(order);
@@ -87,4 +93,11 @@ public class ItemController {
         return itemService.getItemsByVehicleHistory(history);
     }
 
+    // Upload vehicle image to S3
+    @PostMapping("/items/upload")
+    public ResponseEntity<String> uploadVehicleImage(@RequestParam("file") MultipartFile file) {
+        String imageUrl = awsS3Service.saveImageToS3(file);
+        return ResponseEntity.ok(imageUrl);
+    }
 }
+

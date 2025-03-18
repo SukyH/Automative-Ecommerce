@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ApiService from '../service/ApiService';
 
-
 const VehicleDetailsPage = () => {
   const { vehicleId } = useParams();
   const [vehicle, setVehicle] = useState(null);
@@ -15,9 +14,10 @@ const VehicleDetailsPage = () => {
   const [newReview, setNewReview] = useState('');
 
   useEffect(() => {
+    // Fetch vehicle details
     const fetchVehicleDetails = async () => {
       try {
-        const response = await ApiService.getVehicle(vehicleId);
+        const response = await ApiService.getItemById(vehicleId); // Using ApiService to fetch vehicle by ID
         setVehicle(response.data);
         setLoanAmount(response.data.price); // Default loan amount is the vehicle price
       } catch (err) {
@@ -25,9 +25,10 @@ const VehicleDetailsPage = () => {
       }
     };
 
+    // Fetch reviews for the vehicle
     const fetchReviews = async () => {
       try {
-        const response = await ApiService.getVehicleReviews(vehicleId);
+        const response = await ApiService.getVehicleReviews(vehicleId); // Using ApiService to get reviews
         setReviews(response.data);
       } catch (err) {
         console.error('Error fetching reviews:', err);
@@ -57,7 +58,7 @@ const VehicleDetailsPage = () => {
     e.preventDefault();
     try {
       const reviewData = { review: newReview };
-      await ApiService.submitReview(vehicleId, reviewData);
+      await ApiService.submitReview(vehicleId, reviewData); // Using ApiService to submit a review
       setReviews([...reviews, reviewData]); // Optimistically update the reviews list
       setNewReview(''); // Clear the review input
     } catch (err) {
@@ -69,10 +70,14 @@ const VehicleDetailsPage = () => {
 
   return (
     <div>
-      <h1>{vehicle.model}</h1>
+      <h1>{vehicle.name} ({vehicle.modelYear})</h1>
       <img src={vehicle.imageUrl} alt={vehicle.model} />
-      <p>{vehicle.description}</p>
-      <p>${vehicle.price}</p>
+      <p><strong>Brand:</strong> {vehicle.brand}</p>
+      <p><strong>Description:</strong> {vehicle.description}</p>
+      <p><strong>Mileage:</strong> {vehicle.mileage} miles</p>
+      <p><strong>Shape:</strong> {vehicle.shape}</p>
+      <p><strong>Vehicle History:</strong> {vehicle.vehicleHistory}</p>
+      <p><strong>Price:</strong> ${vehicle.price}</p>
 
       {/* Loan Calculator Section */}
       <div>
@@ -101,7 +106,7 @@ const VehicleDetailsPage = () => {
         />
         <br />
         <button onClick={calculateLoan}>Calculate</button>
-        <p>Monthly Payment: ${monthlyPayment.toFixed(2)}</p>
+        <p><strong>Monthly Payment:</strong> ${monthlyPayment.toFixed(2)}</p>
       </div>
 
       {/* Reviews Section */}
@@ -133,4 +138,3 @@ const VehicleDetailsPage = () => {
 };
 
 export default VehicleDetailsPage;
-
