@@ -141,6 +141,14 @@ public class ItemServiceImpl implements ItemService {
         List<Item> items = itemRepo.findByVehicleHistoryWithDamage();
         return items.stream().map(this::convertToDto).collect(Collectors.toList());
     }
-
+    
+    @Override
+    public ItemDto getItemDetails(Long itemId) {
+        return itemRepo.findByVid(itemId)
+                .map(this::convertToDto)
+                .orElseThrow(() -> new RuntimeException("Item not found with ID: " + itemId));
+    }
+    
+ 
 
 }

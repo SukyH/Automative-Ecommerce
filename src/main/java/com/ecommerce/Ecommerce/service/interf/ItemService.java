@@ -17,4 +17,6 @@ public interface ItemService {
 	Item updateItem(ItemDto itemDto);
 	List<ItemDto> getItemsByVehicleHistoryNoDamage();
 	List<ItemDto> getItemsByVehicleHistoryWithDamage();
+	ItemDto getItemDetails(Long itemId);
+	
 }
