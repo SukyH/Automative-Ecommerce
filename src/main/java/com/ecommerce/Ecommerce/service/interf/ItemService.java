@@ -18,4 +18,5 @@ public interface ItemService {
 	List<ItemDto> getItemsByVehicleHistoryNoDamage();
 	List<ItemDto> getItemsByVehicleHistoryWithDamage();
 	List<ItemDto> searchItems(String searchValue);
+	ItemDto getItemDetails(Long itemId);
 }

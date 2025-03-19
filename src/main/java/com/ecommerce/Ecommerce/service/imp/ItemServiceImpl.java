@@ -193,7 +193,20 @@ public class ItemServiceImpl implements ItemService {
 	}
 
     
+    @Override
+    public ItemDto getItemDetails(Long itemId) {
+ 
 
+        return itemRepo.findByVid(itemId)
+ 
+
+                .map(this::convertToDto)
+ 
+
+                .orElseThrow(() -> new RuntimeException("Item not found with ID: " + itemId));
+ 
+
+    }
     
 
 

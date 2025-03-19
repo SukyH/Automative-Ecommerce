@@ -125,5 +125,33 @@ public class ItemController {
         String imageUrl = awsS3Service.saveImageToS3(file);
         return ResponseEntity.ok(imageUrl);
     }
+    @GetMapping("/{itemId}")
+
+    
+
+    public ResponseEntity<ItemDto> getItemDetails(@PathVariable Long itemId) {
+ 
+
+        return ResponseEntity.ok(itemService.getItemDetails(itemId));
+ 
+
+    }
+ 
+
+    
+ 
+
+    
+ 
+
+    
+ 
+
+
+ 
+
+ 
+ 
+    
 }
 
