@@ -44,4 +44,6 @@ public interface ItemRepo extends JpaRepository<Item, Long> {
 
     @Query("SELECT i FROM Item i WHERE i.vehicleHistory IS NOT NULL AND i.vehicleHistory != ''")
     List<Item> findByVehicleHistoryWithDamage();
+
+	List<Item> findByNameContainingIgnoreCase(String searchValue);
 }

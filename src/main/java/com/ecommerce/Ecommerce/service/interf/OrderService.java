@@ -10,5 +10,7 @@ public interface OrderService {
     OrderDto createOrder(Long userId);
     OrderDto addItemToOrder(Long orderId, Long itemId, int quantity);
     OrderDto removeItemFromOrder(Long orderId, Long orderItemId);
+    OrderDto updateOrderStatus(Long orderItemId, String status);
+    OrderDto getOrderItemById(Long orderItemId);
 
 }

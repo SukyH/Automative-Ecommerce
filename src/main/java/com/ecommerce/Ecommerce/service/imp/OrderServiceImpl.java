@@ -4,6 +4,7 @@ import com.ecommerce.Ecommerce.dto.OrderDto;
 import com.ecommerce.Ecommerce.entity.Order;
 import com.ecommerce.Ecommerce.entity.OrderItem;
 import com.ecommerce.Ecommerce.entity.User;
+import com.ecommerce.Ecommerce.enums.OrderStatus;
 import com.ecommerce.Ecommerce.entity.Item;
 import com.ecommerce.Ecommerce.mapper.EntityMapper;
 import com.ecommerce.Ecommerce.repository.OrderRepo;
@@ -83,6 +84,34 @@ public class OrderServiceImpl implements OrderService {
         orderItemRepository.delete(orderItem);  // Delete from DB
         orderRepository.save(order); // Save updated order
 
+        return orderMapper.orderToOrderDto(order);
+    }
+
+    @Override
+    @Transactional
+    public OrderDto updateOrderStatus(Long orderId, String status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+
+        try {
+            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
+            order.setStatus(orderStatus);  // Directly set enum status
+            orderRepository.save(order);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid order status: " + status);
+        }
+
+        return orderMapper.orderToOrderDto(order);
+    }
+
+
+    @Override
+    public OrderDto getOrderItemById(Long orderItemId) {
+        OrderItem orderItem = orderItemRepository.findById(orderItemId)
+                .orElseThrow(() -> new RuntimeException("Order Item not found with ID: " + orderItemId));
+
+        // Return the full order DTO that contains this item
+        Order order = orderItem.getOrder();
         return orderMapper.orderToOrderDto(order);
     }
 

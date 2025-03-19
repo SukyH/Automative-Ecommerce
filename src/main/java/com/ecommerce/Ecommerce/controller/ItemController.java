@@ -111,6 +111,12 @@ public class ItemController {
     public List<ItemDto> getItemsByVehicleHistoryWithDamage() {
         return itemService.getItemsByVehicleHistoryWithDamage();
     }
+    // Search for items by name or other criteria
+   	@GetMapping("/items/search")
+   	public List<ItemDto> searchItems(@RequestParam String searchValue) {
+       	return itemService.searchItems(searchValue);
+   	
+   }
 
 
     //Upload vehicle image to S3

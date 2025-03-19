@@ -141,6 +141,60 @@ public class ItemServiceImpl implements ItemService {
         List<Item> items = itemRepo.findByVehicleHistoryWithDamage();
         return items.stream().map(this::convertToDto).collect(Collectors.toList());
     }
+    
+    @Override
+	public List<ItemDto> searchItems(String searchValue) {
+    	// Implement the search logic, assuming you are searching by name
+    	List<Item> items = itemRepo.findByNameContainingIgnoreCase(searchValue);
+   	 
+    	// Directly map Item to ItemDto without using the convertToDto method
+    	return items.stream()
+                	.map(item -> new ItemDto(
+
+
+                        	item.getVid(),
+            	 
+
+                        	item.getName(),
+            	 
+
+                        	item.getDescription(),
+            	 
+
+                        	item.getBrand(),
+            	 
+
+                        	item.getModel(),
+            	 
+
+                        	item.getImageUrl(),
+            	 
+
+                        	item.getPrice(),
+            	 
+
+                        	item.getQuantity(),
+            	 
+
+                        	item.getMileage(),
+            	 
+
+                        	item.getShape(),   
+            	 
+
+                        	item.getModelYear(),
+            	 
+
+                        	item.getVehicleHistory()
+                   
+             	 
+                        	))
+                	.collect(Collectors.toList());
+	}
+
+    
+
+    
 
 
 }

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.ecommerce.Ecommerce.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Entity
 @Getter
@@ -30,7 +31,8 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private Set<OrderItem> orderItems = new HashSet<>();
-
+    @Enumerated(EnumType.STRING)  
+    private OrderStatus status = OrderStatus.PROCESSED;  // Default status
 
     private LocalDateTime createdAt;
 

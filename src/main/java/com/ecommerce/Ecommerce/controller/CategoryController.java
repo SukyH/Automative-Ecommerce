@@ -20,12 +20,13 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping
+    @GetMapping("all")
     public ResponseEntity<List<Category>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
-    @PostMapping
+    @PostMapping("create")
+
     public ResponseEntity<Category> createCategory(@RequestBody Category category) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(category));
     }
@@ -34,12 +35,12 @@ public class CategoryController {
     public ResponseEntity<Category> getCategoryById(@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
-    @PutMapping("/{id}")
+    @PutMapping("update/{id}")
     public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category category) throws Exception {
         return ResponseEntity.ok(categoryService.updateCategory(id, category));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id) throws Exception {
         categoryService.deleteCategory(id);
         return ResponseEntity.ok("Category deleted successfully");
