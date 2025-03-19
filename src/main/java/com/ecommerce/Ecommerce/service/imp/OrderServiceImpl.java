@@ -43,9 +43,9 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDto createOrder(Long userId) {
         User user = new User();
-        user.setId(userId); // Assign the user ID properly
+        user.setId(userId); 
         Order order = new Order();
-        order.setUser(user); // Set the user association
+        order.setUser(user); 
         order.setCreatedAt(LocalDateTime.now());
         Order savedOrder = orderRepository.save(order);
         return orderMapper.orderToOrderDto(savedOrder);
@@ -55,15 +55,17 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDto addItemToOrder(Long orderId, Long itemId, int quantity) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+            .orElseThrow(() -> new RuntimeException("Order not found"));
+        
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new RuntimeException("Item not found"));
+            .orElseThrow(() -> new RuntimeException("Item not found"));
 
         OrderItem orderItem = new OrderItem(order, item, quantity);
         orderItemRepository.save(orderItem);
 
         return orderMapper.orderToOrderDto(order);
     }
+
 
     @Override
     @Transactional

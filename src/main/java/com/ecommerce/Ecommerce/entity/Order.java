@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Entity
 @Getter
 @Setter
@@ -27,6 +28,7 @@ public class Order {
 
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private Set<OrderItem> orderItems = new HashSet<>();
 
 
