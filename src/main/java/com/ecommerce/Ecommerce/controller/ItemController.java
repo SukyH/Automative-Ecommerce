@@ -3,7 +3,7 @@ package com.ecommerce.Ecommerce.controller;
 import com.ecommerce.Ecommerce.dto.ItemDto;
 import com.ecommerce.Ecommerce.entity.Item;
 import com.ecommerce.Ecommerce.service.interf.ItemService;
-//import com.ecommerce.Ecommerce.service.AwsS3Service;
+import com.ecommerce.Ecommerce.service.AwsS3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +18,8 @@ public class ItemController {
     @Autowired
     private ItemService itemService;
 
-   // @Autowired
-  //  private AwsS3Service awsS3Service;
+    @Autowired
+    private AwsS3Service awsS3Service;
 
     // list vehicles in catalog
     @GetMapping("/items")
@@ -102,17 +102,22 @@ public class ItemController {
         return itemService.getItemsByModelYear(year);
     }
 
-    // Filter by Vehicle History
-    @GetMapping("/items/history/{history}")
-    public List<ItemDto> getItemsByVehicleHistory(@PathVariable String history) {
-        return itemService.getItemsByVehicleHistory(history);
+    @GetMapping("/items/history/no-damage")
+    public List<ItemDto> getItemsByVehicleHistoryNoDamage() {
+        return itemService.getItemsByVehicleHistoryNoDamage();
     }
 
-    // Upload vehicle image to S3
-    //@PostMapping("/items/upload")
-    //public ResponseEntity<String> uploadVehicleImage(@RequestParam("file") MultipartFile file) {
-    //    String imageUrl = awsS3Service.saveImageToS3(file);
-    // ResponseEntity.ok(imageUrl);
-   // }
+    @GetMapping("/items/history/with-damage")
+    public List<ItemDto> getItemsByVehicleHistoryWithDamage() {
+        return itemService.getItemsByVehicleHistoryWithDamage();
+    }
+
+
+    //Upload vehicle image to S3
+    @PostMapping("/items/upload")
+    public ResponseEntity<String> uploadVehicleImage(@RequestParam("file") MultipartFile file) {
+        String imageUrl = awsS3Service.saveImageToS3(file);
+        return ResponseEntity.ok(imageUrl);
+    }
 }
 

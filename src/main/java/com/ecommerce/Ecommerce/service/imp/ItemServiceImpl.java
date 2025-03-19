@@ -127,10 +127,20 @@ public class ItemServiceImpl implements ItemService {
         return items.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
+
+  
+    
     @Override
-    public List<ItemDto> getItemsByVehicleHistory(String history) {
-        List<Item> items = itemRepo.findByVehicleHistory(history);
+    public List<ItemDto> getItemsByVehicleHistoryNoDamage() {
+        List<Item> items = itemRepo.findByVehicleHistoryNoDamage();
         return items.stream().map(this::convertToDto).collect(Collectors.toList());
     }
+
+    @Override
+    public List<ItemDto> getItemsByVehicleHistoryWithDamage() {
+        List<Item> items = itemRepo.findByVehicleHistoryWithDamage();
+        return items.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
 
 }

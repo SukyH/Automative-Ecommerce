@@ -38,4 +38,10 @@ public interface ItemRepo extends JpaRepository<Item, Long> {
     List<Item> findByOrderByMileageAsc();
     List<Item> findByOrderByMileageDesc();
 
+    
+    @Query("SELECT i FROM Item i WHERE i.vehicleHistory IS NULL OR i.vehicleHistory = ''")
+    List<Item> findByVehicleHistoryNoDamage();
+
+    @Query("SELECT i FROM Item i WHERE i.vehicleHistory IS NOT NULL AND i.vehicleHistory != ''")
+    List<Item> findByVehicleHistoryWithDamage();
 }

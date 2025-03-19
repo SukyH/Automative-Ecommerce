@@ -12,7 +12,9 @@ public interface ItemService {
     List<ItemDto> getSortedItemsByMileage(String order);
 	List<ItemDto> getItemsByShape(String shape);
 	List<ItemDto> getItemsByModelYear(Integer year);
-	List<ItemDto> getItemsByVehicleHistory(String history);
+	
 	Item createItem(ItemDto itemDto);
 	Item updateItem(ItemDto itemDto);
+	List<ItemDto> getItemsByVehicleHistoryNoDamage();
+	List<ItemDto> getItemsByVehicleHistoryWithDamage();
 }
