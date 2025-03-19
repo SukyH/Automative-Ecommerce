@@ -77,7 +77,13 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Order Item does not belong to the given Order.");
         }
 
-        orderItemRepository.delete(orderItem);
-        return orderMapper.orderToOrderDto(orderItem.getOrder());
+        Order order = orderItem.getOrder();
+        order.getOrderItems().remove(orderItem);  // Explicitly remove from list
+
+        orderItemRepository.delete(orderItem);  // Delete from DB
+        orderRepository.save(order); // Save updated order
+
+        return orderMapper.orderToOrderDto(order);
     }
+
 }
