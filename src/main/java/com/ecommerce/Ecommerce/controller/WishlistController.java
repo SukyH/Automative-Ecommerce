@@ -28,11 +28,16 @@ public class WishlistController {
     private WishlistService wishlistService;
 
     @PostMapping("/add")
-    public ResponseEntity<String> addToWishlist(
-            @RequestParam Long userId,
-            @RequestParam Long productId) {
+    public ResponseEntity<String> addToWishlist(@RequestBody Map<String, Long> request) {
+        Long userId = request.get("userId");
+        Long productId = request.get("productId");
+
+        if (userId == null || productId == null) {
+            return ResponseEntity.badRequest().body("Missing userId or productId");
+        }
+
         wishlistService.addToWishlist(userId, productId);
-        return ResponseEntity.ok("Product added to wishlist");
+        return ResponseEntity.ok("{\"message\": \"Product added to wishlist\"}");
     }
 
     @GetMapping("/user/{userId}")

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 
 import com.ecommerce.Ecommerce.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -31,6 +32,7 @@ public class Address {
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name= "user_id")
+	@JsonIgnore
 	private User user;
 
 	@Column(name = "created_at")
