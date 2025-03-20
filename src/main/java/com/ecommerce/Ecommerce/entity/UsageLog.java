@@ -13,16 +13,19 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
-@Data
-@Entity
-public class UsageLog {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long logId;
 
-    private Long userId;
-    private String action;
-    private LocalDateTime timestamp;
+	@Entity
+	@Table(name = "VisitEvent")
+	@Data  // Lombok annotation to generate getters, setters, toString, equals, etc.
+	public class UsageLog {
+	    @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    private Long id;
+
+	    private String ipaddress;
+	    private String day;
+	    private String vid;
+	    private String eventtype;
+	}
 
 
-}

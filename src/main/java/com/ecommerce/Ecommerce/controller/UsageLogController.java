@@ -1,37 +1,32 @@
 
 package com.ecommerce.Ecommerce.controller;
 
-import com.ecommerce.Ecommerce.dto.ItemDto;
-import com.ecommerce.Ecommerce.dto.OrderDto;
-import com.ecommerce.Ecommerce.entity.Item;
-import com.ecommerce.Ecommerce.entity.Sales;
 import com.ecommerce.Ecommerce.entity.UsageLog;
-import com.ecommerce.Ecommerce.repository.ItemRepo;
-import com.ecommerce.Ecommerce.service.interf.ItemService;
-import com.ecommerce.Ecommerce.service.interf.SalesService;
 import com.ecommerce.Ecommerce.service.interf.UsageLogService;
-import com.ecommerce.Ecommerce.service.AwsS3Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Map;
+
+
 
 @RestController
-@RequestMapping("/api/usage")
+@RequestMapping("usage")
 public class UsageLogController {
-    @Autowired
-    private UsageLogService usageService;
 
-    @GetMapping("/report")
-    public ResponseEntity<List<UsageLog>> getUsageReport(@RequestParam Long userId) {
-        List<UsageLog> logs = usageService.getUsageLogsByUser(userId);
-        return ResponseEntity.ok(logs);
+    @Autowired
+    private UsageLogService usageLogService;
+    @PostMapping("/track")
+    public void trackVisit(@RequestParam String ipAddress, @RequestParam String vid, @RequestParam String eventType) {
+        usageLogService.trackVisit(ipAddress, vid, eventType);
+    }
+
+    @GetMapping("/reports")
+    public List<UsageLog> getAllReports() {
+        return usageLogService.getAllReports();
     }
 }
- 
+
     

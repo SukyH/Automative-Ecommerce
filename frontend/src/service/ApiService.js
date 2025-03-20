@@ -84,13 +84,51 @@ export default class ApiService {
 
 
    // Fetch the application usage report
-   static async getApplicationUsageReport() {
-       const response = await axios.get(`${this.BASE_URL}/usagereport`, {
-           headers: this.getHeader()
-       });
-       return response.data;
-   }
 
+    // Function to track a visit/event
+  static async trackVisit(ipAddress, vid, eventType) {
+	try {
+  	const response = await axios.post(
+    	`${this.BASE_URL}/usage/track`,
+    	null, 
+    	{
+      	params: {
+        	ipAddress,
+        	vid,
+        	eventType,
+      	},
+      	headers: this.getHeader(), 
+    	}
+  	);
+  	return response.data;
+	} catch (err) {
+  	console.error('Error tracking visit:', err);
+  	throw err;
+	}
+  }
+
+  // Function to fetch the application usage report
+  static async getApplicationUsageReport() {
+	try {
+  	const response = await axios.get(`${this.BASE_URL}/usage/reports`, {
+    	headers: this.getHeader(),
+  	});
+  	return response;
+	} catch (err) {
+  	console.error('Error fetching application usage report:', err);
+  	throw err;
+	}
+  }
+
+  static async getIpAddress() {
+    try {
+      const response = await axios.get('https://api.ipify.org?format=json'); // Example of IP fetching
+      return response.data;
+    } catch (err) {
+      console.error('Error fetching IP address:', err);
+      throw err;
+    }
+  }
 
    // Fetch the monthly sales report
    static async getSalesReport() {
