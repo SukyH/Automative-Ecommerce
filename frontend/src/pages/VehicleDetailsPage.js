@@ -12,26 +12,29 @@ const VehicleDetailsPage = () => {
   const [monthlyPayment, setMonthlyPayment] = useState(0);
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState('');
+  const [rating, setRating] = useState(5)
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch vehicle details
+    // Fetch vehicle details and reviews
     const fetchVehicleDetails = async () => {
       try {
-        const response = await ApiService.getItemById(vehicleId); // Using ApiService to fetch vehicle by ID
+        const response = await ApiService.getItemById(vehicleId);
         setVehicle(response.data);
-        setLoanAmount(response.data.price); // Default loan amount is the vehicle price
+        setLoanAmount(response.data.price); // Default loan amount is vehicle price
       } catch (err) {
         console.error('Error fetching vehicle details:', err);
+        setError('Failed to load vehicle details.');
       }
     };
 
-    // Fetch reviews for the vehicle
     const fetchReviews = async () => {
       try {
-        const response = await ApiService.getVehicleReviews(vehicleId); // Using ApiService to get reviews
+        const response = await ApiService.getItemReviews(vehicleId);
         setReviews(response.data);
       } catch (err) {
         console.error('Error fetching reviews:', err);
+        setError('Failed to load reviews.');
       }
     };
 
@@ -58,15 +61,20 @@ const VehicleDetailsPage = () => {
     e.preventDefault();
     try {
       const reviewData = { review: newReview };
-      await ApiService.submitReview(vehicleId, reviewData); // Using ApiService to submit a review
-      setReviews([...reviews, reviewData]); // Optimistically update the reviews list
-      setNewReview(''); // Clear the review input
+      await ApiService.submitReview(vehicleId, reviewData); // Submit the review
+      setReviews([...reviews, reviewData]); // Optimistic update of reviews
+      setNewReview(''); // Clear the input field
     } catch (err) {
       console.error('Error submitting review:', err);
     }
   };
 
-  if (!vehicle) return <p>Loading...</p>;
+  // Show error message if API failed
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (!vehicle) return <p>Loading...</p>; // Show loading if vehicle data is not yet loaded
 
   return (
     <div>
@@ -77,7 +85,7 @@ const VehicleDetailsPage = () => {
       <p><strong>Mileage:</strong> {vehicle.mileage} miles</p>
       <p><strong>Shape:</strong> {vehicle.shape}</p>
       <p><strong>Vehicle History:</strong> {vehicle.vehicleHistory}</p>
-      <p><strong>Price:</strong> ${vehicle.price}</p>
+      <p><strong>Price:</strong> ${vehicle.price.toLocaleString()}</p> {/* Price formatted as currency */}
 
       {/* Loan Calculator Section */}
       <div>
@@ -117,24 +125,31 @@ const VehicleDetailsPage = () => {
         ) : (
           reviews.map((review, index) => (
             <div key={index}>
-              <p>{review.review}</p>
+              <p><strong>Rating:</strong> {"⭐".repeat(review.rating)}</p>
+              <p>{review.comment}</p>
             </div>
           ))
         )}
 
-        {/* Submit New Review */}
-        <form onSubmit={handleReviewSubmit}>
-          <textarea
-            value={newReview}
-            onChange={(e) => setNewReview(e.target.value)}
-            placeholder="Write a review..."
-          ></textarea>
-          <br />
-          <button type="submit">Submit Review</button>
-        </form>
-      </div>
+<form onSubmit={handleReviewSubmit}>
+        <h4>Leave a Review</h4>
+        <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+          {[1, 2, 3, 4, 5].map((num) => (
+            <option key={num} value={num}>
+              {num} Star{num > 1 ? "s" : ""}
+            </option>
+          ))}
+        </select>
+        <textarea
+          value={newReview}
+          onChange={(e) => setNewReview(e.target.value)}
+          placeholder="Write your review here..."
+        ></textarea>
+        <button type="submit">Submit Review</button>
+      </form>
+    </div>
     </div>
   );
 };
-
 export default VehicleDetailsPage;
+

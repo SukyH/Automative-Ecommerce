@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import com.ecommerce.Ecommerce.entity.Item;
+import java.util.Optional;
 
 public interface ItemRepo extends JpaRepository<Item, Long> {
 
@@ -46,6 +47,15 @@ public interface ItemRepo extends JpaRepository<Item, Long> {
 
     @Query("SELECT i FROM Item i WHERE i.vehicleHistory IS NOT NULL AND i.vehicleHistory != ''")
     List<Item> findByVehicleHistoryWithDamage();
-    
+
+
     Optional<Item> findByVid(Long vid);
+    List<Item> findByNameContainingIgnoreCase(String searchValue);
+
+	List<Item> findByBrandContainingAndShapeContainingAndModelYearAndVehicleHistoryContaining(String brand,
+			String shape, Integer modelYear, String vehicleHistory);
+
+	
+	void deleteById(Long itemId);
+
 }

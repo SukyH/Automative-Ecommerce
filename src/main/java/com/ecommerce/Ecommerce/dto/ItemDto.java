@@ -39,6 +39,10 @@ public class ItemDto {
 	    private String shape;  
 	    private Integer modelYear;  
 	    private String vehicleHistory;  
+	    private String interiorColor;
+	    private String exteriorColor;
+	    private String fabric;
+
 	
 	
 }

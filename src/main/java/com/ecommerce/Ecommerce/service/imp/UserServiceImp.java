@@ -65,7 +65,7 @@ public class UserServiceImp implements UserService {
 
         // Fetch user by email or throw a default exception if not found
         User user = userRepo.findByEmail(loginRequest.getEmail())
-                            .orElseThrow(() -> new RuntimeException("User not found with the provided email"));
+                            .orElseThrow(() -> new UsernameNotFoundException("User not found with the provided email"));
 
         // Check if password matches or throw a default exception for invalid credentials
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {

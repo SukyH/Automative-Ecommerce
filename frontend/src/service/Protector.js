@@ -41,7 +41,10 @@ const Protector = ({ component: Component, isAdminRequired, ...rest }) => {
         isAuthenticated && (!isAdminRequired || isAdmin) ? (
           <Component />
         ) : isAuthenticated ? (
-          <Navigate to="/not-authorized" />
+          <div>
+            <h2>Not Authorized</h2>
+            <p>You don't have permission to access this page.</p>
+          </div>
         ) : (
           <Navigate to="/login" />
         )

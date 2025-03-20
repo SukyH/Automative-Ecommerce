@@ -1,13 +1,21 @@
+
 package com.ecommerce.Ecommerce.mapper;
 
 import com.ecommerce.Ecommerce.dto.*;
 import com.ecommerce.Ecommerce.entity.*;
+import com.ecommerce.Ecommerce.enums.OrderStatus;
+
 import org.mapstruct.*;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface EntityMapper {
+	
+	default int map(OrderStatus value) {
+	    return value != null ? value.ordinal() : 0; // or use value.getCode() if applicable
+	}
+
 
 
 	@Named("BasicUserToUserDto")
@@ -55,8 +63,9 @@ public interface EntityMapper {
     Response itemToResponse(Item item);
     Response orderItemToResponse(OrderItem orderItem);
     Response orderToResponse(Order order);
+    
     Response paymentToResponse(Payment payment);
-    Response reviewToResponse(Review review);
+  
     
     // List Mappings (If you need lists of items and order items)
     List<ItemDto> itemsToItemDtos(List<Item> items);

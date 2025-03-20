@@ -4,12 +4,15 @@ import com.ecommerce.Ecommerce.dto.OrderDto;
 import com.ecommerce.Ecommerce.entity.Order;
 import com.ecommerce.Ecommerce.entity.OrderItem;
 import com.ecommerce.Ecommerce.entity.User;
+import com.ecommerce.Ecommerce.enums.OrderStatus;
 import com.ecommerce.Ecommerce.entity.Item;
 import com.ecommerce.Ecommerce.mapper.EntityMapper;
 import com.ecommerce.Ecommerce.repository.OrderRepo;
 import com.ecommerce.Ecommerce.repository.OrderItemRepo;
 import com.ecommerce.Ecommerce.repository.ItemRepo;
 import com.ecommerce.Ecommerce.service.interf.OrderService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +22,7 @@ import java.util.Optional;
 
 @Service
 public class OrderServiceImpl implements OrderService {
-
+     @Autowired
     private final OrderRepo orderRepository;
     private final OrderItemRepo orderItemRepository;
     private final ItemRepo itemRepository;
@@ -32,7 +35,11 @@ public class OrderServiceImpl implements OrderService {
         this.itemRepository = itemRepository;
         this.orderMapper = orderMapper;
     }
+  
 
+    public List<Item> getAllItemsInOrder(Long orderId) {
+        return orderRepository.findItemsByOrderId(orderId);
+    }
     @Override
     public List<OrderDto> getOrdersByUser(Long userId) {
         List<Order> orders = orderRepository.findByUserId(userId);
@@ -85,5 +92,25 @@ public class OrderServiceImpl implements OrderService {
 
         return orderMapper.orderToOrderDto(order);
     }
+
+    @Override
+    @Transactional
+    public OrderDto updateOrderStatus(Long orderId, String status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+
+        try {
+            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
+            order.setStatus(orderStatus);  // Directly set enum status
+            orderRepository.save(order);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid order status: " + status);
+        }
+
+        return orderMapper.orderToOrderDto(order);
+    }
+
+
+    
 
 }

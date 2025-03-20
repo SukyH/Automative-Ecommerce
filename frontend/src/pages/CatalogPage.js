@@ -17,7 +17,7 @@ const CatalogPage = () => {
     const fetchVehicles = async () => {
       try {
         setLoading(true);
-        const response = await ApiService.getVehicles();
+        const response = await ApiService.getAllItems();
         setVehicles(response.data.content);
         setFilteredVehicles(response.data.content); // Initial vehicles to display
         setHotDeals(response.data.content.filter(vehicle => vehicle.hotDeal)); // Hot deals filtering

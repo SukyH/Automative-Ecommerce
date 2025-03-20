@@ -3,6 +3,9 @@ import java.math.BigDecimal;
 
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters.LocalDateTimeConverter;
 
 import com.ecommerce.Ecommerce.enums.UserRole;
@@ -33,19 +36,31 @@ public class Item {
     private Integer mileage; 
     private String shape;  
     private Integer modelYear;  
-    private String vehicleHistory;  
+    private String vehicleHistory; 
+    @ElementCollection
+    private List<String> reviews = new ArrayList<>();
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name= "category_id")
 	private Category category;
 	
 	
-	
+	@ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
 	
 	@Column(name = "created_at")
 	@CreationTimestamp
 	@Convert(converter = LocalDateTimeConverter.class)
 	private final LocalDateTime createdAt = LocalDateTime.now(); 
 	
-	
+	@Column(name = "interior_color")
+	private String interiorColor;
+
+	@Column(name = "exterior_color")
+	private String exteriorColor;
+
+	@Column(name = "fabric")
+	private String fabric;
+
 }
