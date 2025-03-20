@@ -132,7 +132,7 @@ export default class ApiService {
 
    // Fetch the monthly sales report
    static async getSalesReport() {
-       const response = await axios.get(`${this.BASE_URL}/salesreport`, {
+       const response = await axios.get(`${this.BASE_URL}/orders/report/monthly-orders`, {
            headers: this.getHeader()
        });
        return response.data;
