@@ -15,10 +15,12 @@ import com.ecommerce.Ecommerce.service.interf.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.yaml.snakeyaml.util.EnumUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -36,10 +38,12 @@ public class OrderServiceImpl implements OrderService {
         this.orderMapper = orderMapper;
     }
   
-
+    @Transactional(readOnly = true)
     public List<Item> getAllItemsInOrder(Long orderId) {
         return orderRepository.findItemsByOrderId(orderId);
     }
+
+    
     @Override
     public List<OrderDto> getOrdersByUser(Long userId) {
         List<Order> orders = orderRepository.findByUserId(userId);
@@ -100,6 +104,8 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
 
         try {
+        	
+
             OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
             order.setStatus(orderStatus);  // Directly set enum status
             orderRepository.save(order);

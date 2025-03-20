@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/orders")
@@ -25,6 +26,7 @@ public class OrderController {
         }
         return ResponseEntity.ok(items);
     }
+
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<OrderDto>> getOrdersByUser(@PathVariable Long userId) {
@@ -53,15 +55,20 @@ public class OrderController {
   
     @PutMapping("/update-status/{orderId}")
     public ResponseEntity<OrderDto> updateOrderStatus(
-            @PathVariable Long orderId,       // Path variable for order ID
-            @RequestParam String status) {    // Request parameter for new status
+            @PathVariable Long orderId,
+            @RequestBody Map<String, String> payload) {
+
+        String status = payload.get("status");
+        if (status == null || status.isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
 
         try {
-            // Call the service to update the order status
             OrderDto updatedOrder = orderService.updateOrderStatus(orderId, status);
-            return ResponseEntity.ok(updatedOrder); // Return the updated order
+            return ResponseEntity.ok(updatedOrder);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(null); // Return bad request on failure
+            return ResponseEntity.badRequest().body(null);
         }
     }
+
 }

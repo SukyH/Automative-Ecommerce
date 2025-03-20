@@ -29,24 +29,16 @@ public class Order {
     private Long orderID;
 
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
     private Set<OrderItem> orderItems = new HashSet<>();
+
+    
     @Enumerated(EnumType.STRING)  
     private OrderStatus status = OrderStatus.PROCESSED;  // Default status
        
     
-    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
-    private List<Item> items;
 
-    // Getter and setter methods
-    public List<Item> getItems() {
-        return items;
-    }
-
-    public void setItems(List<Item> items) {
-        this.items = items;
-    }
     private LocalDateTime createdAt;
 
 }

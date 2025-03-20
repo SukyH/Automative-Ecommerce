@@ -57,5 +57,16 @@ public interface ItemRepo extends JpaRepository<Item, Long> {
 
 	
 	void deleteById(Long itemId);
+	
+	@Query("SELECT i FROM Item i WHERE "
+		     + "(:brand IS NULL OR i.brand LIKE %:brand%) AND "
+		     + "(:shape IS NULL OR i.shape LIKE %:shape%) AND "
+		     + "(:modelYear IS NULL OR i.modelYear = :modelYear) AND "
+		     + "(:vehicleHistory IS NULL OR i.vehicleHistory LIKE %:vehicleHistory%)")
+		List<Item> filterItems(@Param("brand") String brand,
+		                       @Param("shape") String shape,
+		                       @Param("modelYear") Integer modelYear,
+		                       @Param("vehicleHistory") String vehicleHistory);
+
 
 }

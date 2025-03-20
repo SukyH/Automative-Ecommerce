@@ -215,13 +215,16 @@ public class ItemServiceImpl implements ItemService {
 
 
 	
-	
 	@Override
 	public List<ItemDto> filterItems(String brand, String shape, Integer modelYear, String vehicleHistory) {
-		List<Item> items = itemRepo.findByBrandContainingAndShapeContainingAndModelYearAndVehicleHistoryContaining(
-				brand, shape, modelYear, vehicleHistory
-				);
-		return items.stream().map(this::convertToDto).collect(Collectors.toList());
+	    List<Item> items = itemRepo.filterItems(
+	        brand != null && !brand.isEmpty() ? brand : null,
+	        shape != null && !shape.isEmpty() ? shape : null,
+	        modelYear, 
+	        vehicleHistory != null && !vehicleHistory.isEmpty() ? vehicleHistory : null
+	    );
+
+	    return items.stream().map(this::convertToDto).collect(Collectors.toList());
 	}
 
 
