@@ -69,6 +69,13 @@ public class OrderController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(null);
         }
+        
+        
     }
-
+    
+    @GetMapping("/report/monthly-orders")
+    public ResponseEntity<List<Map<String, Object>>> getMonthlyOrderReport() {
+        List<Map<String, Object>> report = orderService.generateMonthlyOrderReport();
+        return ResponseEntity.ok(report);
+    }
 }

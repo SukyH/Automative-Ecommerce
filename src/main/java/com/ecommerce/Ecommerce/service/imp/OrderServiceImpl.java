@@ -17,9 +17,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yaml.snakeyaml.util.EnumUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+
+
 import java.util.stream.Collectors;
 
 @Service
@@ -115,8 +121,53 @@ public class OrderServiceImpl implements OrderService {
 
         return orderMapper.orderToOrderDto(order);
     }
-
-
     
+    @Override
+    public List<Map<String, Object>> generateMonthlyOrderReport() {
+        List<Map<String, Object>> ordersPerMonth = orderRepository.countOrdersPerMonth();
+        List<Map<String, Object>> itemsPerMonth = orderItemRepository.countItemsPerMonthWithSales();
+
+        // Map to structure data
+        Map<String, Map<String, Object>> reportMap = new HashMap<>();
+
+        // Process orders per month
+        for (Map<String, Object> order : ordersPerMonth) {
+            String key = order.get("year") + "-" + order.get("month");
+            Map<String, Object> monthReport = new HashMap<>();
+            monthReport.put("year", order.get("year"));
+            monthReport.put("month", order.get("month"));
+            monthReport.put("totalOrders", order.get("orderCount"));
+            monthReport.put("totalSales", BigDecimal.ZERO); // Initialize total sales
+            monthReport.put("items", new ArrayList<Map<String, Object>>());
+            reportMap.put(key, monthReport);
+        }
+
+        // Process items per month
+        for (Map<String, Object> item : itemsPerMonth) {
+            String key = item.get("year") + "-" + item.get("month");
+            Map<String, Object> monthReport = reportMap.getOrDefault(key, new HashMap<>());
+            if (!monthReport.containsKey("items")) {
+                monthReport.put("items", new ArrayList<Map<String, Object>>());
+            }
+
+            List<Map<String, Object>> itemList = (List<Map<String, Object>>) monthReport.get("items");
+            Map<String, Object> itemData = new HashMap<>();
+            itemData.put("itemName", item.get("itemName"));
+            itemData.put("quantity", item.get("totalQuantity"));
+            itemData.put("totalSales", item.get("totalSales"));
+
+            itemList.add(itemData);
+
+            // Convert BigDecimal to avoid casting issues
+            BigDecimal currentTotalSales = (BigDecimal) monthReport.getOrDefault("totalSales", BigDecimal.ZERO);
+            BigDecimal itemTotalSales = (BigDecimal) item.get("totalSales");
+
+            monthReport.put("totalSales", currentTotalSales.add(itemTotalSales));
+            reportMap.put(key, monthReport);
+        }
+
+        return new ArrayList<>(reportMap.values());
+    }
+
 
 }
