@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ApiService from '../service/ApiService';
 
 
@@ -12,7 +12,9 @@ const CatalogPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [hotDeals, setHotDeals] = useState([]);
-
+  const [selectedVehicles, setSelectedVehicles] = useState([]);
+  const history = useNavigate();
+  
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
@@ -61,7 +63,40 @@ const CatalogPage = () => {
 
     setFilteredVehicles(filtered);
   };
+   // Handle Select Vehicle for Comparison
+   const handleSelectVehicle = (vehicle) => {
+    if (selectedVehicles.length < 3) {
+      setSelectedVehicles([...selectedVehicles, vehicle]);
+    } else {
+      alert("You can only compare up to 3 vehicles.");
+    }
+  };
 
+ // Function to remove a vehicle from comparison
+ const handleRemoveVehicle = (vehicleId) => {
+  setSelectedVehicles(selectedVehicles.filter(vehicle => vehicle.id !== vehicleId));
+};
+ // Render comparison details
+ const comparisonDetails = selectedVehicles.length > 0 && (
+  <div>
+    <h2>Comparison</h2>
+    <div className="comparison-table">
+      {selectedVehicles.map(vehicle => (
+        <div key={vehicle.id} className="vehicle-comparison">
+          <h3>{vehicle.model}</h3>
+          <img src={vehicle.imageUrl} alt={vehicle.model} />
+          <p><strong>Brand:</strong> {vehicle.brand}</p>
+          <p><strong>Price:</strong> ${vehicle.price}</p>
+          <p><strong>Model Year:</strong> {vehicle.modelYear}</p>
+          <p><strong>Rating:</strong> {vehicle.rating}</p>
+          <p><strong>Reviews:</strong> {vehicle.reviews}</p>
+          <button onClick={() => handleRemoveVehicle(vehicle.id)}>Remove from Comparison</button>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+ 
   return (
     <div>
       <h1>Catalog</h1>
@@ -118,13 +153,18 @@ const CatalogPage = () => {
                 <img src={vehicle.imageUrl} alt={vehicle.model} />
                 <p>{vehicle.model}</p>
                 <p>${vehicle.price}</p>
+                <button onClick={() => handleSelectVehicle(vehicle)}>Compare</button>
               </div>
             </Link>
           ))
         )}
       </div>
+    {/* Display comparison details*/}
+    {comparisonDetails}
     </div>
   );
 };
+
+
 
 export default CatalogPage;

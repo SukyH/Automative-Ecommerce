@@ -6,33 +6,16 @@ const Protector = ({ component: Component, isAdminRequired, ...rest }) => {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const authToken = localStorage.getItem('authToken');
+    const authToken = localStorage.getItem('token');  // Use 'token' to check auth status
+    const role = localStorage.getItem('role');  // Role stored in localStorage
 
     if (authToken) {
-      const decodedToken = decodeJwt(authToken);
-      if (decodedToken) {
-        setIsAuthenticated(true);
-        setIsAdmin(decodedToken.isAdmin);
+      setIsAuthenticated(true);
+      if (role) {
+        setIsAdmin(role === 'ADMIN');  // Check if the role is 'ADMIN'
       }
     }
   }, []);
-
-  const decodeJwt = (token) => {
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map((c) => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
-          .join('')
-      );
-      return JSON.parse(jsonPayload);
-    } catch (e) {
-      console.error('Error decoding JWT:', e);
-      return null;
-    }
-  };
 
   return (
     <Route
