@@ -19,13 +19,22 @@ public interface EntityMapper {
 
 
 	@Named("BasicUserToUserDto")
+    @Mapping(target = "address", ignore = true)
     UserDto userToUserDto(User user);
     User userDtoToUser(UserDto userDto);
+    
+    UserDto fullUserToUserDto(User user);
 
-    // Address Mappings
+ // Basic Address to AddressDto Mapping (Avoids Circular Dependency)
+    @Named("BasicAddressToAddressDto")
+    @Mapping(target = "user", ignore = true)
     AddressDto addressToAddressDto(Address address);
-    Address addressDtoToAddress(AddressDto addressDto);
 
+    // Full Address to AddressDto Mapping
+    AddressDto fullAddressToAddressDto(Address address);
+
+    // Convert AddressDto back to Address
+    Address addressDtoToAddress(AddressDto addressDto);
     // Category Mappings
     CategoryDto categoryToCategoryDto(Category category);
     Category categoryDtoToCategory(CategoryDto categoryDto);
@@ -48,6 +57,8 @@ public interface EntityMapper {
 
     @Mapping(target = "orderItemList", source = "orders")
     @Mapping(target = "address", source = "user.address")
+    
+ 
 
     UserDto mapUserToDtoPlusAddressAndOrderHistory(User user);
 
