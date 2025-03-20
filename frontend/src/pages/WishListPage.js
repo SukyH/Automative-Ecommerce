@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ApiService from '../service/ApiService';
- 
+
 const WishlistPage = () => {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,9 +9,16 @@ const WishlistPage = () => {
   // Fetch the wishlist from the server
   useEffect(() => {
     const fetchWishlist = async () => {
+      const userId = localStorage.getItem('userId'); // Assuming user ID is stored in localStorage
+      if (!userId) {
+        setError('User is not logged in.');
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
-        const response = await ApiService.getWishlist(); // Assuming this fetches the user's wishlist
+        const response = await ApiService.getWishlist(userId); // Pass userId to the API call
         setWishlist(response.data);
         setLoading(false);
       } catch (err) {
@@ -26,6 +33,12 @@ const WishlistPage = () => {
 
   // Remove vehicle from wishlist
   const handleRemoveFromWishlist = async (vehicleId) => {
+    const userId = localStorage.getItem('userId'); // Fetch userId from localStorage
+    if (!userId) {
+      setError('User is not logged in.');
+      return;
+    }
+
     try {
       await ApiService.removeFromWishlist(vehicleId); // API call to remove the vehicle
       setWishlist(wishlist.filter(vehicle => vehicle.id !== vehicleId)); // Optimistically update the UI

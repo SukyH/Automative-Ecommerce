@@ -44,9 +44,22 @@ export default class ApiService {
 
 
    // Wishlist APIs
-   static async getWishlist() {
+   static async addToWishlist(userId, itemId) {
+    try {
+        const response = await axios.post(`${this.BASE_URL}/wishlist/add`, null, {
+            params: { userId, itemId },
+            headers: this.getHeader(),
+        });
+        return response.data;
+    } catch (err) {
+        console.error("Error adding product to wishlist:", err);
+        throw err;
+    }
+}
+
+   static async getWishlist(userId) {
        try {
-           const response = await axios.get(`${this.BASE_URL}/wishlist`, {
+           const response = await axios.get(`${this.BASE_URL}/wishlist/user/${userId}`, {
                headers: this.getHeader(),
            });
            return response.data;
@@ -57,9 +70,9 @@ export default class ApiService {
    }
 
 
-   static async removeFromWishlist(vehicleId) {
+   static async removeFromWishlist(itemId) {
        try {
-           const response = await axios.delete(`${this.BASE_URL}/wishlist/${vehicleId}`, {
+           const response = await axios.delete(`${this.BASE_URL}/wishlist/${itemId}`, {
                headers: this.getHeader(),
            });
            return response.data;

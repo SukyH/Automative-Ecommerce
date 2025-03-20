@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/wishlist")
+@RequestMapping("wishlist")
 public class WishlistController {
     @Autowired
     private WishlistService wishlistService;
@@ -37,8 +37,15 @@ public class WishlistController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Wishlist>> getWishlist(@PathVariable Long userId) {
-        List<Wishlist> wishlist = wishlistService.getWishlistByUser(userId);
+        List<Wishlist> wishlist = wishlistService.getWishlist(userId);
         return ResponseEntity.ok(wishlist);
     }
+    
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<String> removeFromWishlist(@PathVariable Long productId, @RequestParam Long userId) {
+        wishlistService.removeFromWishlist(userId, productId);
+        return ResponseEntity.ok("Product removed from wishlist");
+    }
+
 }
     
