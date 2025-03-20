@@ -3,6 +3,7 @@ package com.ecommerce.Ecommerce.service.imp;
 import com.ecommerce.Ecommerce.dto.LoginRequest;
 import com.ecommerce.Ecommerce.dto.Response;
 import com.ecommerce.Ecommerce.dto.UserDto;
+import com.ecommerce.Ecommerce.entity.Address;
 import com.ecommerce.Ecommerce.entity.User;
 import com.ecommerce.Ecommerce.enums.UserRole;
 import com.ecommerce.Ecommerce.mapper.EntityMapper;
@@ -42,13 +43,29 @@ public class UserServiceImp implements UserService {
             role = UserRole.ADMIN;
         }
 
-        User user = User.builder()
-                .name(registrationRequest.getName())
-                .email(registrationRequest.getEmail())
-                .phoneNumber(registrationRequest.getPhoneNumber())
-                .password(passwordEncoder.encode(registrationRequest.getPassword()))
-                .role(role)
-                .build();
+     
+
+        // Create User entity
+        User user = new User();
+        user.setName(registrationRequest.getName());
+        user.setEmail(registrationRequest.getEmail());
+        user.setPhoneNumber(registrationRequest.getPhoneNumber());
+        user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
+        user.setRole(role);
+
+        // Create Address entity and link it to user
+        if (registrationRequest.getAddress() != null) {
+            Address address = new Address();
+            address.setStreet(registrationRequest.getAddress().getStreet());
+            address.setCity(registrationRequest.getAddress().getCity());
+            address.setProvince(registrationRequest.getAddress().getProvince());
+            address.setCountry(registrationRequest.getAddress().getCountry());
+            address.setZipCode(registrationRequest.getAddress().getZipCode());
+            address.setUser(user);
+                
+            user.setAddress(address);
+        }
+
 
         User savedUser = userRepo.save(user);
         log.info("User successfully registered with email: {}", registrationRequest.getEmail());

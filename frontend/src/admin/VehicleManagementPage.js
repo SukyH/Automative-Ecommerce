@@ -132,6 +132,35 @@ const VehicleManagement = () => {
     setNewVehicle({ ...newVehicle, [name]: value });
   };
 
+ const handleAddHotDeal = async (vehicleId, discount) => {
+	try {
+  	const response = await ApiService.addHotDeal(vehicleId, discount);
+  	alert(`Hot Deal added with ${discount}% off!`);
+  	const updatedVehicles = vehicles.map(vehicle =>
+    	vehicle.id === vehicleId ? { ...vehicle, hotDeal: true, discount } : vehicle
+  	);
+  	setVehicles(updatedVehicles);
+	} catch (err) {
+  	console.error('Error adding hot deal:', err);
+  	alert('Failed to add hot deal');
+	}
+  };
+
+ 
+  const handleRemoveHotDeal = async (hotDealId) => {
+	try {
+  	await ApiService.removeHotDeal(hotDealId);
+  	alert('Hot Deal removed!');
+  	const updatedVehicles = vehicles.map(vehicle =>
+    	vehicle.hotDealId === hotDealId ? { ...vehicle, hotDeal: false, discount: null } : vehicle
+  	);
+  	setVehicles(updatedVehicles);
+	} catch (err) {
+  	console.error('Error removing hot deal:', err);
+  	alert('Failed to remove hot deal');
+	}
+  };
+
   if (loading) return <p>Loading vehicles...</p>;
   if (error) return <p>{error}</p>;
 
@@ -274,6 +303,13 @@ const VehicleManagement = () => {
               <td>${vehicle.price}</td>
               <td>{vehicle.quantity}</td>
               <td>
+              {vehicle.hotDeal ? (
+              	<span>🔥 {vehicle.discount}% Off!</span>
+            	) : (
+              	<button onClick={() => handleAddHotDeal(vehicle.id, 10)}>Add Hot Deal</button>
+            	)}
+          	</td>
+          	<td>
                 <button onClick={() => handleUpdateVehicle(vehicle.vid, { price: 12000, image: vehicle.imageUrl })}>
                   Update
                 </button>

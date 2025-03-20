@@ -398,6 +398,60 @@ static async submitReview(itemId, rating, comment) {
         throw error;
     }
 }
+static async removeFromWishlist(itemId) {
+       try {
+           const response = await axios.delete(`${this.BASE_URL}/wishlist/${itemId}`, {
+               headers: this.getHeader(),
+           });
+           return response.data;
+       } catch (err) {
+           console.error("Error removing vehicle from wishlist:", err);
+           throw err;
+       }
+   }
+   //  Fetch all hot deals
+  static async getAllHotDeals() {
+	try {
+  	const response = await axios.get(`${this.BASE_URL}/hot-deals/all`, {
+    	headers: this.getHeader(),
+  	});
+  	return response.data;
+	} catch (err) {
+  	console.error('Error fetching hot deals:', err);
+  	throw err;
+	}
+  }
+
+  // Add a new hot deal (Admin only)
+  static async addHotDeal(itemId, discount) {
+	try {
+  	const response = await axios.post(
+    	`${this.BASE_URL}/hot-deals/add/${itemId}`,
+    	null,
+    	{
+      	params: { discount },
+      	headers: this.getHeader(),
+    	}
+  	);
+  	return response.data;
+	} catch (err) {
+  	console.error('Error adding hot deal:', err);
+  	throw err;
+	}
+  }
+
+  // 🗑️ Remove a hot deal (Admin only)
+  static async removeHotDeal(hotDealId) {
+	try {
+  	const response = await axios.delete(`${this.BASE_URL}/hot-deals/remove/${hotDealId}`, {
+    	headers: this.getHeader(),
+  	});
+  	return response.data;
+	} catch (err) {
+  	console.error('Error removing hot deal:', err);
+  	throw err;
+	}
+  }
 
 
    //admin analytics api

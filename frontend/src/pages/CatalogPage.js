@@ -16,22 +16,27 @@ const CatalogPage = () => {
   const history = useNavigate();
   
   useEffect(() => {
-    const fetchVehicles = async () => {
+    const fetchVehiclesAndDeals = async () => {
       try {
         setLoading(true);
-        const response = await ApiService.getAllItems();
-        setVehicles(response.data.content);
-        setFilteredVehicles(response.data.content); // Initial vehicles to display
-        setHotDeals(response.data.content.filter(vehicle => vehicle.hotDeal)); // Hot deals filtering
+  
+        const vehicleResponse = await ApiService.getAllItems();
+        setVehicles(vehicleResponse.content);
+        setFilteredVehicles(vehicleResponse.content);
+  
+        const hotDealsResponse = await ApiService.getAllHotDeals();
+        setHotDeals(hotDealsResponse);
+  
         setLoading(false);
       } catch (err) {
-        console.error('Error fetching vehicles:', err);
-        setError('Failed to load vehicles.');
+        console.error('Error fetching data:', err);
+        setError('Failed to load data.');
         setLoading(false);
       }
     };
-    fetchVehicles();
+    fetchVehiclesAndDeals();
   }, []);
+  
 
   // Handle Search
   const handleSearch = (e) => {
@@ -121,24 +126,28 @@ const CatalogPage = () => {
 
       {/* Hot Deals Section */}
       <div>
-        <h2>Hot Deals</h2>
-        <div className="vehicle-grid">
-          {hotDeals.length === 0 ? (
-            <p>No hot deals available at the moment.</p>
-          ) : (
-            hotDeals.map(vehicle => (
-              <Link key={vehicle.id} to={`/vehicle/${vehicle.id}`}>
-                <div className="vehicle-card">
-                  <img src={vehicle.imageUrl} alt={vehicle.model} />
-                  <p>{vehicle.model}</p>
-                  <p>${vehicle.price}</p>
-                  <span>Hot Deal!</span>
-                </div>
-              </Link>
-            ))
-          )}
-        </div>
-      </div>
+  <h2>🔥 Hot Deals</h2>
+  <div className="vehicle-grid">
+    {hotDeals.length === 0 ? (
+      <p>No hot deals available at the moment.</p>
+    ) : (
+      hotDeals.map(deal => (
+        <Link key={deal.id} to={`/vehicle/${deal.item.id}`}>
+          <div className="vehicle-card hot-deal-card">
+            <img src={deal.item.imageUrl} alt={deal.item.model} />
+            <h3>{deal.item.model}</h3>
+            <p className="original-price">${deal.item.price}</p>
+            <p className="discounted-price">
+              ${deal.item.price - deal.item.price * (deal.discount / 100)}
+            </p>
+            <span className="deal-tag">🔥 {deal.discount}% OFF!</span>
+          </div>
+        </Link>
+      ))
+    )}
+  </div>
+</div>
+
 
       {/* Catalog Grid */}
       <div className="vehicle-grid">

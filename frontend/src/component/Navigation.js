@@ -9,6 +9,20 @@ const Navigation = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const navigate = useNavigate();
 
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const loadCartCount = () => {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      setCartCount(cart.length);
+    };
+  
+    loadCartCount();
+    window.addEventListener('cartUpdate', loadCartCount);
+  
+    return () => window.removeEventListener('cartUpdate', loadCartCount);
+  }, []);
+  
   useEffect(() => {
     const checkLoginStatus = () => {
       const token = localStorage.getItem('token');
@@ -49,6 +63,12 @@ const Navigation = () => {
         <div className="nav-links">
           <Link to="/" className="nav-link">Home</Link>
           <Link to="/catalog" className="nav-link">Catalog</Link>
+             
+              {/* Shopping Cart Button */}
+              <Link to="/cart" className="nav-link">
+            <i className="fas fa-shopping-cart"></i> Cart
+             {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+            </Link>
 
           {isLoggedIn ? (
             <>

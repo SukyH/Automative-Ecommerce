@@ -1,54 +1,156 @@
-import React, { useState, useEffect } from 'react';
-import ApiService from '../service/ApiService';  // Import the ApiService for API calls
-import { useNavigate, useParams } from 'react-router-dom';  // Import for navigation and route params
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import ApiService from '../service/ApiService';
 
-const ShoppingCartPage = () => {
-  const [cartItems, setCartItems] = useState([]);
-  const navigate = useNavigate();  // Hook for navigation
-  const { orderId } = useParams();  
+const RegistrationPage = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    phoneNumber: '',
+    address: {
+      street: '',
+      city: '',
+      province: '',
+      country: '',
+      postalCode: '', // Added postalCode
+    },
+  });
 
-  useEffect(() => {
-    // Fetch the items in the order when the component mounts
-    const fetchItemsInOrder = async () => {
-      try {
-        const data = await ApiService.getAllItemsInOrder(orderId);  // Fetch items by orderId
-        setCartItems(data);  // Set cart items to state
-      } catch (error) {
-        console.error('Error fetching items in order:', error);
-      }
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  // Handle changes for both user and address fields
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name.startsWith('address.')) {
+      const addressField = name.split('.')[1];
+      setFormData({
+        ...formData,
+        address: { ...formData.address, [addressField]: value },
+      });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    
+    const registrationPayload = {
+      ...formData,
+      role: 'USER', // Default role still "USER"
     };
 
-    if (orderId) {
-      fetchItemsInOrder();  // Only fetch if orderId is available
-    }
-  }, [orderId]);  // Fetch again if orderId changes
+    try {
+      const response = await ApiService.registerUser(registrationPayload);
 
-  const handleProceedToCheckout = () => {
-    if (cartItems.length > 0) {
-      navigate('/checkout');  // Navigate to checkout page
-    } else {
-      alert('Your cart is empty!');  // Display message if cart is empty
+      if (response && response.status === 200) {
+        alert('Registration successful! Please log in.');
+        navigate('/login');
+      } else {
+        setError('Registration failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      setError('Registration failed: ' + (error.response?.data?.message || error.message));
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h1>Your Cart</h1>
-      {cartItems.length === 0 ? (
-        <p>Your cart is empty</p>
-      ) : (
-        cartItems.map((item) => (
-          <div key={item.id} className="cart-item">
-            <img src={item.imageUrl} alt={item.name} style={{ width: '100px', height: '100px' }} />
-            <p>{item.name}</p>
-            <p>${item.price}</p>
-            <p>Quantity: {item.quantity}</p>
-          </div>
-        ))
-      )}
-      <button onClick={handleProceedToCheckout}>Proceed to Checkout</button>
+    <div className="registration-container">
+      <h1>Register</h1>
+      <form onSubmit={handleRegister}>
+        {/* User Info */}
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Name"
+          required
+        />
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="Email"
+          required
+        />
+        <input
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+          placeholder="Password"
+          required
+        />
+        <input
+          type="tel"
+          name="phoneNumber"
+          value={formData.phoneNumber}
+          onChange={handleChange}
+          placeholder="Phone Number"
+          required
+        />
+
+        <h2>Address</h2>
+        {/* Address Fields */}
+        <input
+          type="text"
+          name="address.street"
+          value={formData.address.street}
+          onChange={handleChange}
+          placeholder="Street"
+          required
+        />
+        <input
+          type="text"
+          name="address.city"
+          value={formData.address.city}
+          onChange={handleChange}
+          placeholder="City"
+          required
+        />
+        <input
+          type="text"
+          name="address.province"
+          value={formData.address.province}
+          onChange={handleChange}
+          placeholder="Province/State"
+          required
+        />
+        <input
+          type="text"
+          name="address.postalCode" // Added postalCode input
+          value={formData.address.postalCode}
+          onChange={handleChange}
+          placeholder="Postal Code"
+          required
+        />
+        <input
+          type="text"
+          name="address.country"
+          value={formData.address.country}
+          onChange={handleChange}
+          placeholder="Country"
+          required
+        />
+
+        <button type="submit" disabled={loading}>
+          {loading ? 'Registering...' : 'Register'}
+        </button>
+      </form>
+      {error && <p className="error-text">{error}</p>}
     </div>
   );
 };
 
-export default ShoppingCartPage;
+export default RegistrationPage;

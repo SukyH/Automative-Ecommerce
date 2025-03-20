@@ -39,8 +39,11 @@ const ShoppingCartPage = () => {
   };
 
   const handleProceedToCheckout = () => {
-    
-    navigate('/checkout'); // Example redirect to checkout page
+    if (cartItems.length > 0) {
+      navigate('/checkout');  // Navigate to checkout page
+    } else {
+      alert('Your cart is empty!');  // Display message if cart is empty
+    }
   };
 
   return (
@@ -50,7 +53,8 @@ const ShoppingCartPage = () => {
         <p>Your cart is empty</p>
       ) : (
         cartItems.map((item) => (
-          <div key={item.id} style={{ marginBottom: '20px' }}>
+          <div key={item.id} className="cart-item">
+            <img src={item.imageUrl} alt={item.name} style={{ width: '100px', height: '100px' }} />
             <div>
               <p><strong>{item.name}</strong></p>
               <p>${item.price}</p>
@@ -80,3 +84,10 @@ const ShoppingCartPage = () => {
 };
 
 export default ShoppingCartPage;
+
+
+  
+
+
+
+  
