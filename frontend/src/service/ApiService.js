@@ -149,14 +149,23 @@ export default class ApiService {
    }
 
 
-   static async getAllItems() {
-       const response = await axios.get(`${this.BASE_URL}catalog/items`);
-       return response.data;
-   }
+   static async getAllItems(page = 0, size = 10) {
+    const response = await axios.get(`${this.BASE_URL}/catalog/items`, {
+        params: { page, size }
+    });
+    return response.data;
+}
+static async filterItems(filters) {
+    const response = await axios.get(`${this.BASE_URL}/catalog/items/filter`, {
+        params: filters
+    });
+    return response.data;
+}
+
 
 
    static async searchItems(searchValue) {
-       const response = await axios.get(`${this.BASE_URL}catalog/items/search`, {
+       const response = await axios.get(`${this.BASE_URL}/catalog/items/search`, {
            params: { searchValue }
        });
        return response.data;
@@ -164,22 +173,23 @@ export default class ApiService {
 
 
    static async getAllItemsByCategoryId(categoryId) {
-       const response = await axios.get(`${this.BASE_URL}categories/${categoryId}`);
+       const response = await axios.get(`${this.BASE_URL}/categories/${categoryId}`);
        return response.data;
    }
 
 
    static async getItemById(itemId) {
-       const response = await axios.get(`${this.BASE_URL}catalog/items/${itemId}`);
+       const response = await axios.get(`${this.BASE_URL}/catalog/items/${itemId}`);
        return response.data;
    }
      //start from here
-   static async deleteItem(itemId) {
-       const response = await axios.delete(`${this.BASE_URL}/item/delete/${itemId}`, {
-           headers: this.getHeader()
-       });
-       return response.data;
-   }
+     static async deleteItem(itemId) {
+        const response = await axios.delete(`${this.BASE_URL}/catalog/items/delete/${itemId}`, {
+            headers: this.getHeader()
+        });
+        return response.data;
+    }
+    
 
 
    /* Category API */
@@ -204,7 +214,7 @@ export default class ApiService {
 
 
    static async updateCategory(categoryId, body) {
-       const response = await axios.put(`${this.BASE_URL}/categories/${categoryId}`, body, {
+       const response = await axios.put(`${this.BASE_URL}/categories/update/${categoryId}`, body, {
            headers: this.getHeader()
        });
        return response.data;
@@ -212,7 +222,7 @@ export default class ApiService {
 
 
    static async deleteCategory(categoryId) {
-       const response = await axios.delete(`${this.BASE_URL}/categories/${categoryId}`, {
+       const response = await axios.delete(`${this.BASE_URL}/categories/delete/${categoryId}`, {
            headers: this.getHeader()
        });
        return response.data;
@@ -220,48 +230,50 @@ export default class ApiService {
 
 
    /* Orders API */
-   static async createOrder(body) {
-       const response = await axios.post(`${this.BASE_URL}/orders/create`, body, {
-           headers: this.getHeader()
-       });
-       return response.data;
-   }
+   static async createOrder(userId, body) {
+    const url = userId ? `${this.BASE_URL}/orders/create/${userId}` : `${this.BASE_URL}/orders/create`;
+    const response = await axios.post(url, body, {
+        headers: this.getHeader()
+    });
+    return response.data;
+}
+
+   // Add the getAllItemsInOrder method
+static async getAllItemsInOrder(orderId) {
+    try {
+        const response = await axios.get(`${this.BASE_URL}/orders/${orderId}/items`, {
+            headers: this.getHeader()
+        });
+        return response.data;  
+    } catch (error) {
+        console.error('Error fetching items in order:', error);
+        throw error;  
+    }
+}
 
 
-   static async getAllOrders() {
-       const response = await axios.get(`${this.BASE_URL}/order/filter`, {
-           headers: this.getHeader()
-       });
-       return response.data;
-   }
+   static async getAllOrders(userId) {
+    const response = await axios.get(`${this.BASE_URL}/orders/user/${userId}`, { // Adjust the endpoint if necessary
+        headers: this.getHeader()
+    });
+    return response.data;
+}
 
-
-   static async getOrderItemById(itemId) {
-       const response = await axios.get(`${this.BASE_URL}/order/filter`, {
-           headers: this.getHeader(),
-           params: { itemId }
-       });
-       return response.data;
-   }
-
-
-   static async getAllOrderItemsByStatus(status) {
-       const response = await axios.get(`${this.BASE_URL}/order/filter`, {
-           headers: this.getHeader(),
-           params: { status }
-       });
-       return response.data;
-   }
-
-
-   static async updateOrderitemStatus(orderItemId, status) {
-       const response = await axios.put(`${this.BASE_URL}/order/update-item-status/${orderItemId}`, {}, {
-           headers: this.getHeader(),
-           params: { status }
-       });
-       return response.data;
-   }
-
+// Method to update order status
+static async updateOrderStatus(orderId, status) {
+    try {
+        const response = await axios.put(`${this.BASE_URL}/orders/update-status/${orderId}`, 
+            { status }, 
+            {
+                headers: this.getHeader()
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Error updating order status:", error);
+        throw error;
+    }
+}
 
    /* Address API */
    static async saveAddress(body) {
@@ -282,6 +294,31 @@ export default class ApiService {
        });
        return response.data; // Image URL
    }
+//reviews api
+
+static async getVehicleReviews(itemId) {
+    try {
+        const response = await axios.get(`${this.BASE_URL}/vehicles/${itemId}/reviews`, {
+            headers: this.getHeader()
+        });
+        return response.data;  
+    } catch (error) {
+        console.error('Error fetching vehicle reviews:', error);
+        throw error;  
+    }
+}
+
+static async submitReview(itemId, reviewData) {
+    try {
+        const response = await axios.post(`${this.BASE_URL}/vehicles/${itemId}/reviews`, reviewData, {
+            headers: this.getHeader()
+        });
+        return response.data;  
+    } catch (error) {
+        console.error('Error submitting review:', error);
+        throw error;  
+    }
+}
 
 
    /* Authentication checker API */
@@ -302,4 +339,37 @@ export default class ApiService {
        const role = localStorage.getItem('role');
        return role === 'ADMIN';
    }
+   //reviews api
+   // Fetch item reviews
+static async getItemReviews(itemId) {
+    try {
+        const response = await axios.get(`${this.BASE_URL}/items/${itemId}/reviews`, {
+            headers: this.getHeader(),
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching item reviews:', error);
+        throw error;
+    }
+}
+
+// Submit an item review (rating + comment)
+static async submitReview(itemId, rating, comment) {
+    try {
+        const response = await axios.post(
+            `${this.BASE_URL}/items/${itemId}/reviews`,
+            { rating, comment },
+            {
+                headers: this.getHeader(),
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error submitting review:', error);
+        throw error;
+    }
+}
+
+
+   //admin analytics api
 }

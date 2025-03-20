@@ -5,6 +5,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import com.ecommerce.Ecommerce.enums.OrderStatus;
@@ -33,7 +34,19 @@ public class Order {
     private Set<OrderItem> orderItems = new HashSet<>();
     @Enumerated(EnumType.STRING)  
     private OrderStatus status = OrderStatus.PROCESSED;  // Default status
+       
+    
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+    private List<Item> items;
 
+    // Getter and setter methods
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
     private LocalDateTime createdAt;
 
 }

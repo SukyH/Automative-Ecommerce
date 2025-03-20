@@ -48,4 +48,7 @@ public interface ItemRepo extends JpaRepository<Item, Long> {
 
     Optional<Item> findByVid(Long vid);
     List<Item> findByNameContainingIgnoreCase(String searchValue);
+
+	List<Item> findByBrandContainingAndShapeContainingAndModelYearAndVehicleHistoryContaining(String brand,
+			String shape, Integer modelYear, String vehicleHistory);
 }

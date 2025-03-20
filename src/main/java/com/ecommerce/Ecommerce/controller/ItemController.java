@@ -2,6 +2,7 @@ package com.ecommerce.Ecommerce.controller;
 
 import com.ecommerce.Ecommerce.dto.ItemDto;
 import com.ecommerce.Ecommerce.entity.Item;
+import com.ecommerce.Ecommerce.repository.ItemRepo;
 import com.ecommerce.Ecommerce.service.interf.ItemService;
 import com.ecommerce.Ecommerce.service.AwsS3Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/catalog")
@@ -23,9 +25,11 @@ public class ItemController {
 
     // list vehicles in catalog
     @GetMapping("/items")
-    public List<ItemDto> getAllItems() {
-        return itemService.getAllItems();
+    public ResponseEntity<List<ItemDto>> getAllItems(@RequestParam(defaultValue = "0") int page,
+                                                      @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(itemService.getAllItems(page, size));
     }
+
     
     @PostMapping("/items/create")
     public ItemDto createItem(@RequestBody ItemDto itemDto) {
@@ -126,16 +130,57 @@ public class ItemController {
         return ResponseEntity.ok(imageUrl);
     }
     @GetMapping("/{itemId}")
-
-    
-
     public ResponseEntity<ItemDto> getItemDetails(@PathVariable Long itemId) {
- 
-
-        return ResponseEntity.ok(itemService.getItemDetails(itemId));
- 
-
+      return ResponseEntity.ok(itemService.getItemDetails(itemId));
+     }
+    
+    @DeleteMapping("/delete/{itemId}")
+    public ResponseEntity<Void> deleteItem(@PathVariable Long itemId) {
+        itemService.deleteItem(itemId);
+        return ResponseEntity.noContent().build();  // Returns a 204 No Content status after deletion
     }
+    @GetMapping("/catalog/items/filter")
+    public ResponseEntity<List<ItemDto>> filterItems(
+        @RequestParam(required = false) String brand,
+        @RequestParam(required = false) String shape,
+        @RequestParam(required = false) Integer modelYear,
+        @RequestParam(required = false) String vehicleHistory
+    ) {
+        return ResponseEntity.ok(itemService.filterItems(brand, shape, modelYear, vehicleHistory));
+    }
+
+
+        @GetMapping("/{itemId}/reviews")
+        public ResponseEntity<List<Map<String, String>>> getItemReviews(@PathVariable Long itemId) {
+            List<String> rawReviews = itemService.getItemReviews(itemId);
+
+            List<Map<String, String>> formattedReviews = rawReviews.stream()
+                    .map(review -> {
+                        String[] parts = review.split("\\|", 2);
+                        return Map.of("rating", parts[0], "comment", parts[1]);
+                    })
+                    .toList();
+
+            return ResponseEntity.ok(formattedReviews);
+        }
+
+        @PostMapping("/{itemId}/reviews")
+        public ResponseEntity<Item> addReview(
+                @PathVariable Long itemId,
+                @RequestBody Map<String, String> payload) {
+
+            int rating = Integer.parseInt(payload.get("rating"));
+            String comment = payload.get("comment");
+
+            if (rating < 1 || rating > 5) {
+                return ResponseEntity.badRequest().body(null);
+            }
+
+            Item updatedItem = itemService.addReview(itemId, rating, comment);
+            return ResponseEntity.ok(updatedItem);
+        }
+    }
+
  
 
     
@@ -153,5 +198,5 @@ public class ItemController {
  
  
     
-}
+
 

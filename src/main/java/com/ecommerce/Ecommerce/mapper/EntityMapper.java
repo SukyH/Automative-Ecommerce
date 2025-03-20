@@ -55,8 +55,9 @@ public interface EntityMapper {
     Response itemToResponse(Item item);
     Response orderItemToResponse(OrderItem orderItem);
     Response orderToResponse(Order order);
+    
     Response paymentToResponse(Payment payment);
-    Response reviewToResponse(Review review);
+  
     
     // List Mappings (If you need lists of items and order items)
     List<ItemDto> itemsToItemDtos(List<Item> items);

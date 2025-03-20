@@ -6,6 +6,10 @@ import com.ecommerce.Ecommerce.repository.ItemRepo;
 import com.ecommerce.Ecommerce.service.interf.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,10 +63,12 @@ public class ItemServiceImpl implements ItemService {
         return itemRepo.save(existingItem);
     }
     @Override
-    public List<ItemDto> getAllItems() {
-        List<Item> items = itemRepo.findAll();
-        return items.stream().map(this::convertToDto).collect(Collectors.toList());
+    public List<ItemDto> getAllItems(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Item> itemPage = itemRepo.findAll(pageable);
+        return itemPage.getContent().stream().map(this::convertToDto).collect(Collectors.toList());
     }
+
 
     @Override
     public List<ItemDto> getItemsByBrand(String brand) {
@@ -207,6 +213,37 @@ public class ItemServiceImpl implements ItemService {
  
 
     }
+    
+    @Override
+    public void deleteItem(Long itemId) {
+        Item item = itemRepo.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found"));
+        itemRepo.delete(item);
+    }
+    @Override
+    public List<ItemDto> filterItems(String brand, String shape, Integer modelYear, String vehicleHistory) {
+        List<Item> items = itemRepo.findByBrandContainingAndShapeContainingAndModelYearAndVehicleHistoryContaining(
+            brand, shape, modelYear, vehicleHistory
+        );
+        return items.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+ 
+
+        public List<String> getItemReviews(Long itemId) {
+            Item item = itemRepo.findByVid(itemId)
+                    .orElseThrow(() -> new RuntimeException("Item not found"));
+            return item.getReviews();
+        }
+
+        public Item addReview(Long itemId, int rating, String comment) {
+            Item item = itemRepo.findByVid(itemId)
+                    .orElseThrow(() -> new RuntimeException("Item not found"));
+
+            String formattedReview = rating + "|" + comment;
+            item.getReviews().add(formattedReview);
+            return itemRepo.save(item);
+        
+    }
+
     
 
 

@@ -11,6 +11,8 @@ import com.ecommerce.Ecommerce.repository.OrderRepo;
 import com.ecommerce.Ecommerce.repository.OrderItemRepo;
 import com.ecommerce.Ecommerce.repository.ItemRepo;
 import com.ecommerce.Ecommerce.service.interf.OrderService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +22,7 @@ import java.util.Optional;
 
 @Service
 public class OrderServiceImpl implements OrderService {
-
+     @Autowired
     private final OrderRepo orderRepository;
     private final OrderItemRepo orderItemRepository;
     private final ItemRepo itemRepository;
@@ -33,7 +35,11 @@ public class OrderServiceImpl implements OrderService {
         this.itemRepository = itemRepository;
         this.orderMapper = orderMapper;
     }
+  
 
+    public List<Item> getAllItemsInOrder(Long orderId) {
+        return orderRepository.findItemsByOrderId(orderId);
+    }
     @Override
     public List<OrderDto> getOrdersByUser(Long userId) {
         List<Order> orders = orderRepository.findByUserId(userId);
@@ -105,14 +111,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    @Override
-    public OrderDto getOrderItemById(Long orderItemId) {
-        OrderItem orderItem = orderItemRepository.findById(orderItemId)
-                .orElseThrow(() -> new RuntimeException("Order Item not found with ID: " + orderItemId));
-
-        // Return the full order DTO that contains this item
-        Order order = orderItem.getOrder();
-        return orderMapper.orderToOrderDto(order);
-    }
+    
 
 }

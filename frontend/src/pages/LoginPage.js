@@ -1,6 +1,6 @@
-// LoginPage.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ApiService from '../service/ApiService';  // Import your ApiService
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -8,17 +8,22 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const history = useNavigate();
 
-  const handleLogin = () => {
-    // Dummy authentication logic (replace with your actual authentication logic)
-    if (username === 'user' && password === 'password') {
-      localStorage.setItem('authToken', 'yourAuthToken'); // Save the auth token in localStorage
-      localStorage.setItem('isAdmin', 'false'); // Regular user
-      history.push('/dashboard'); // Redirect to dashboard for user
-    } else if (username === 'admin' && password === 'admin') {
-      localStorage.setItem('authToken', 'yourAuthToken'); // Save the auth token
-      localStorage.setItem('isAdmin', 'true'); // Admin user
-      history.push('/admin'); // Redirect to admin page
-    } else {
+  const handleLogin = async () => {
+    try {
+   
+      const response = await ApiService.loginUser({ email: username, password });
+
+      
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('role', response.role);
+
+      // Redirect based on user role
+      if (response.role === 'ADMIN') {
+        history('/admin');  // Redirect to Admin Dashboard
+      } else {
+        history('/');  // Redirect to Home Page (regular user)
+      }
+    } catch (error) {
       setError('Invalid credentials');
     }
   };
@@ -28,7 +33,7 @@ const LoginPage = () => {
       <h2>Login</h2>
       <input
         type="text"
-        placeholder="Username"
+        placeholder="Email"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
       />
