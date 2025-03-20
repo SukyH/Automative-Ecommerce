@@ -2,9 +2,11 @@ package com.ecommerce.Ecommerce.service.interf;
 import com.ecommerce.Ecommerce.dto.OrderDto;
 import com.ecommerce.Ecommerce.entity.Item;
 
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public interface OrderService {
@@ -14,6 +16,8 @@ public interface OrderService {
     OrderDto removeItemFromOrder(Long orderId, Long orderItemId);
     OrderDto updateOrderStatus(Long orderItemId, String status);
 	List<Item> getAllItemsInOrder(Long orderId);
+	public List<Map<String, Object>> generateMonthlyOrderReport();
+	
 
 
 }
