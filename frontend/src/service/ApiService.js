@@ -90,14 +90,28 @@ export default class ApiService {
 
    /* Authentication and user API */
    static async registerUser(registration) {
-       const response = await axios.post(`${this.BASE_URL}/auth/register`, registration);
-       return response.data;
+    try {
+        const response = await axios.post(`${this.BASE_URL}/auth/register`, registration);
+        return response.data;
+    } catch (error) {
+        console.error("Registration failed:", error);
+        throw error;  // Rethrow the error for further handling (e.g., showing error messages)
+    }
    }
 
 
    static async loginUser(loginDetails) {
-       const response = await axios.post(`${this.BASE_URL}/auth/login`, loginDetails);
-       return response.data;
+    try {
+        const response = await axios.post(`${this.BASE_URL}/auth/login`, loginDetails);
+        // Store the tokens in localStorage
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('role', response.data.role);
+        localStorage.setItem('refreshToken', response.data.refreshToken);  // If available
+        return response.data;
+    } catch (error) {
+        console.error("Login failed:", error);
+        throw error;  // Rethrow the error for further handling
+    }
    }
 
 
@@ -124,8 +138,28 @@ export default class ApiService {
            throw error;  // If the error is not token-related, just throw it
        }
    }
+  
+  
 
 
+   /* Authentication checker API */
+   static logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('refreshToken');  // Remove the refresh token as well
+}
+
+
+static isAuthenticated() {
+    const token = localStorage.getItem('token');
+    return !!token;
+}
+
+
+static isAdmin() {
+    const role = localStorage.getItem('role');
+    return role === 'ADMIN';
+}
    // Item API (updated as per your mapping)
    static async addItem(formData) {
        const response = await axios.post(`${this.BASE_URL}/catalog/items/create`, formData, {
@@ -321,24 +355,6 @@ static async submitReview(itemId, reviewData) {
 }
 
 
-   /* Authentication checker API */
-   static logout() {
-       localStorage.removeItem('token');
-       localStorage.removeItem('role');
-       localStorage.removeItem('refreshToken');  // Remove the refresh token as well
-   }
-
-
-   static isAuthenticated() {
-       const token = localStorage.getItem('token');
-       return !!token;
-   }
-
-
-   static isAdmin() {
-       const role = localStorage.getItem('role');
-       return role === 'ADMIN';
-   }
    //reviews api
    // Fetch item reviews
 static async getItemReviews(itemId) {

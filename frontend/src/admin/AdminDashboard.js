@@ -1,14 +1,12 @@
 import React from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import ApiService from '../service/ApiService';
-
 
 const AdminDashboard = () => {
-  const userRole = localStorage.getItem('role');
+  const userRole = localStorage.getItem('role');  // Get role from localStorage
 
   // Check if the user is an admin
   if (userRole !== 'ADMIN') {
-    return <Navigate to="/" />;
+    return <Navigate to="/" />;  // Redirect to home if not an admin
   }
 
   return (
@@ -24,3 +22,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+

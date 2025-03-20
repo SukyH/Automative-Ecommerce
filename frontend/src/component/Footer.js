@@ -13,19 +13,7 @@ const Footer = () => {
             <h5>Leading the way in electric vehicle retail</h5>
             <div>
             
-            </div>
-          </div>
-          <div>
-            <div>
-              <div>
-                <span>Useful Links</span>
-                <ul>
-                  <li>
-                    <Link to="/catalog">Catalog</Link>
-                  </li>
-                  
-                </ul>
-              </div>
+            
              
              
             </div>
