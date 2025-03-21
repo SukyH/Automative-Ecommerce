@@ -225,7 +225,7 @@ static isAdmin() {
 
 
    static async updateItem(formData) {
-       const response = await axios.put(`${this.BASE_URL}catalog/items/update`, formData, {
+       const response = await axios.put(`${this.BASE_URL}/catalog/items/update`, formData, {
            headers: {
                ...this.getHeader(),
                "Content-Type": "multipart/form-data"
@@ -249,41 +249,41 @@ static isAdmin() {
 }*/
  
 static async getItemsByBrand(brand) {
-	const response = await axios.get(`${this.BASE_URL}/items/brand/${brand}`);
+	const response = await axios.get(`${this.BASE_URL}/catalog/items/brand/${brand}`);
 	return response.data;
   }
 
   static async getSortedItemsByPrice(order) {
-	const response = await axios.get(`${this.BASE_URL}/items/sort`, {
+	const response = await axios.get(`${this.BASE_URL}/catalog/items/sort`, {
   	params: { order }
 	});
 	return response.data;
   }
 
   static async getSortedItemsByMileage(order) {
-	const response = await axios.get(`${this.BASE_URL}/items/sort/mileage`, {
+	const response = await axios.get(`${this.BASE_URL}/catalog/items/sort/mileage`, {
   	params: { order }
 	});
 	return response.data;
   }
 
   static async getItemsByShape(shape) {
-	const response = await axios.get(`${this.BASE_URL}/items/shape/${shape}`);
+	const response = await axios.get(`${this.BASE_URL}/catalog/items/shape/${shape}`);
 	return response.data;
   }
 
   static async getItemsByModelYear(year) {
-	const response = await axios.get(`${this.BASE_URL}/items/year/${year}`);
+	const response = await axios.get(`${this.BASE_URL}/catalog/items/year/${year}`);
 	return response.data;
   }
 
   static async getItemsByVehicleHistoryNoDamage() {
-	const response = await axios.get(`${this.BASE_URL}/items/history/no-damage`);
+	const response = await axios.get(`${this.BASE_URL}/catalog/items/history/no-damage`);
 	return response.data;
   }
 
   static async getItemsByVehicleHistoryWithDamage() {
-	const response = await axios.get(`${this.BASE_URL}/items/history/with-damage`);
+	const response = await axios.get(`${this.BASE_URL}/catalog/items/history/with-damage`);
 	return response.data;
   }
 
@@ -433,7 +433,7 @@ static async updateOrderStatus(orderId, status) {
    // Fetch item reviews
 static async getItemReviews(itemId) {
     try {
-        const response = await axios.get(`${this.BASE_URL}/items/${itemId}/reviews`, {
+        const response = await axios.get(`${this.BASE_URL}/catalog/items/${itemId}/reviews`, {
             headers: this.getHeader(),
         });
         return response.data;
@@ -447,7 +447,7 @@ static async getItemReviews(itemId) {
 static async submitReview(itemId, rating, comment) {
     try {
         const response = await axios.post(
-            `${this.BASE_URL}/items/${itemId}/reviews`,
+            `${this.BASE_URL}/catalog/items/${itemId}/reviews`,
             { rating, comment },
             {
                 headers: this.getHeader(),
