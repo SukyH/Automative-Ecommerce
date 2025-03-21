@@ -4,6 +4,7 @@ package com.ecommerce.Ecommerce.controller;
 import com.ecommerce.Ecommerce.dto.ItemDto;
 import com.ecommerce.Ecommerce.dto.OrderDto;
 import com.ecommerce.Ecommerce.entity.Item;
+import com.ecommerce.Ecommerce.entity.Review;
 import com.ecommerce.Ecommerce.repository.ItemRepo;
 import com.ecommerce.Ecommerce.service.interf.ItemService;
 import com.ecommerce.Ecommerce.service.AwsS3Service;
@@ -163,51 +164,34 @@ public class ItemController {
     }
 
 
-        @GetMapping("/{itemId}/reviews")
-        public ResponseEntity<List<Map<String, String>>> getItemReviews(@PathVariable Long itemId) {
-            List<String> rawReviews = itemService.getItemReviews(itemId);
+    @PostMapping("/{itemId}/reviews")
+    public ResponseEntity<Review> addReview(
+            @PathVariable Long itemId,
+            @RequestBody Map<String, Object> payload) {
 
-            List<Map<String, String>> formattedReviews = rawReviews.stream()
-                    .map(review -> {
-                        String[] parts = review.split("\\|", 2);
-                        return Map.of("rating", parts[0], "comment", parts[1]);
-                    })
-                    .toList();
+    	int rating = Integer.parseInt(payload.get("rating").toString());
+    	String comment = payload.get("comment").toString();
 
-            return ResponseEntity.ok(formattedReviews);
+
+        if (rating < 1 || rating > 5) {
+            return ResponseEntity.badRequest().body(null);
         }
 
-        @PostMapping("/{itemId}/reviews")
-        public ResponseEntity<Item> addReview(
-                @PathVariable Long itemId,
-                @RequestBody Map<String, String> payload) {
-
-            int rating = Integer.parseInt(payload.get("rating"));
-            String comment = payload.get("comment");
-
-            if (rating < 1 || rating > 5) {
-                return ResponseEntity.badRequest().body(null);
-            }
-
-            Item updatedItem = itemService.addReview(itemId, rating, comment);
-            return ResponseEntity.ok(updatedItem);
-        }
+        Review saved = itemService.addReview(itemId, rating, comment);
+        return ResponseEntity.ok(saved);
     }
 
- 
+
+    @GetMapping("/{itemId}/reviews")
+    public ResponseEntity<List<Review>> getItemReviews(@PathVariable Long itemId) {
+        return ResponseEntity.ok(itemService.getItemReviews(itemId));
+    }
+
+
+}
 
     
- 
-
-    
- 
-
-    
- 
 
 
- 
-
- 
  
     

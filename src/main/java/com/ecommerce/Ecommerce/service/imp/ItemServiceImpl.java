@@ -2,7 +2,9 @@ package com.ecommerce.Ecommerce.service.imp;
 
 import com.ecommerce.Ecommerce.dto.ItemDto;
 import com.ecommerce.Ecommerce.entity.Item;
+import com.ecommerce.Ecommerce.entity.Review;
 import com.ecommerce.Ecommerce.repository.ItemRepo;
+import com.ecommerce.Ecommerce.repository.ReviewRepository;
 import com.ecommerce.Ecommerce.service.interf.ItemService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -23,6 +25,9 @@ public class ItemServiceImpl implements ItemService {
 
 	@Autowired
 	private ItemRepo itemRepo;
+	@Autowired
+	private   ReviewRepository reviewRepo;
+
 
 
 	@Override
@@ -229,23 +234,30 @@ public class ItemServiceImpl implements ItemService {
 
 	    return items.stream().map(this::convertToDto).collect(Collectors.toList());
 	}
+	
+	
+	@Override
+	public Review addReview(Long itemId, int rating, String comment) {
+	    Item item = itemRepo.findByVid(itemId)
+	            .orElseThrow(() -> new RuntimeException("Item not found"));
 
+	    Review review = new Review();
+	    review.setRating(rating);
+	    review.setComment(comment);
+	    review.setItem(item);
 
-	public List<String> getItemReviews(Long itemId) {
-		Item item = itemRepo.findByVid(itemId)
-				.orElseThrow(() -> new RuntimeException("Item not found"));
-		return item.getReviews();
+	    return reviewRepo.save(review);
 	}
 
-	public Item addReview(Long itemId, int rating, String comment) {
-		Item item = itemRepo.findByVid(itemId)
-				.orElseThrow(() -> new RuntimeException("Item not found"));
 
-		String formattedReview = rating + "|" + comment;
-		item.getReviews().add(formattedReview);
-		return itemRepo.save(item);
 
+	@Override
+	public List<Review> getItemReviews(Long itemId) {
+	    return reviewRepo.findByItemVid(itemId);
 	}
+
+
+
 
 
 

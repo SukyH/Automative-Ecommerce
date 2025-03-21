@@ -444,21 +444,24 @@ static async getItemReviews(itemId) {
 }
 
 // Submit an item review (rating + comment)
-static async submitReview(itemId, rating, comment) {
-    try {
-        const response = await axios.post(
-            `${this.BASE_URL}/catalog/${itemId}/reviews`,
-            { rating, comment },
-            {
-                headers: this.getHeader(),
-            }
-        );
-        return response.data;
-    } catch (error) {
-        console.error('Error submitting review:', error);
-        throw error;
-    }
+static async submitReview(itemId, reviewData) {
+  try {
+    const response = await axios.post(
+      `${this.BASE_URL}/catalog/${itemId}/reviews`,
+      reviewData,
+      {
+        headers: this.getHeader(),
+      }
+    );
+    return response.data;
+  } catch (err) {
+    console.error("Review submission failed:", err.response || err);
+    throw err;
+  }
 }
+
+
+
 
    //  Fetch all hot deals
    static async getAllHotDeals() {

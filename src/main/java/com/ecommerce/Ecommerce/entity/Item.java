@@ -11,6 +11,7 @@ import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters.LocalDa
 import com.ecommerce.Ecommerce.enums.UserRole;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -39,8 +40,12 @@ public class Item {
     private String shape;  
     private Integer modelYear;  
     private String vehicleHistory; 
-    @ElementCollection
-    private List<String> reviews = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Review> reviews = new ArrayList<>();
+
+
 	
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name= "category_id")

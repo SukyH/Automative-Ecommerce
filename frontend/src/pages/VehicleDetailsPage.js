@@ -22,17 +22,16 @@ const VehicleDetailsPage = () => {
         const vehicleData = await ApiService.getItemById(vehicleId);
         setVehicle(vehicleData);
         setLoanAmount(vehicleData.price); // Default loan amount is vehicle price
-      } 		catch (err) {
-		  console.error('Error fetching vehicle details:', err.response || err);
-		  setError('Failed to load vehicle details.');
-		}
-
+      } catch (err) {
+        console.error('Error fetching vehicle details:', err.response || err);
+        setError('Failed to load vehicle details.');
+      }
     };
 
     const fetchReviews = async () => {
       try {
         const response = await ApiService.getItemReviews(vehicleId);
-        setReviews(response.data);
+        setReviews(response);
       } catch (err) {
         console.error('Error fetching reviews:', err);
         setError('Failed to load reviews.');
@@ -58,17 +57,26 @@ const VehicleDetailsPage = () => {
   };
 
   // Handle new review submission
+  // Handle new review submission
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     try {
-      const reviewData = { review: newReview };
-      await ApiService.submitReview(vehicleId, reviewData); // Submit the review
-      setReviews([...reviews, reviewData]); // Optimistic update of reviews
-      setNewReview(''); // Clear the input field
+      const reviewData = {
+        rating: rating,
+        comment: newReview
+      };
+
+      await ApiService.submitReview(vehicleId, reviewData); 
+      const response = await ApiService.getItemReviews(vehicleId); // Refresh reviews
+      setReviews(response);
+      setNewReview('');
+      setRating(5);
     } catch (err) {
       console.error('Error submitting review:', err);
+      setError('Failed to submit review');
     }
   };
+
 
   // Show error message if API failed
   if (error) {
@@ -121,38 +129,36 @@ const VehicleDetailsPage = () => {
       {/* Reviews Section */}
       <div>
         <h3>Reviews</h3>
-		{Array.isArray(reviews) && reviews.length === 0 ? (
-		  <p>No reviews yet...</p>
-		) : (
-		  Array.isArray(reviews) &&
-		  reviews.map((review, index) => (
-		    <div key={index}>
-		      <p><strong>Rating:</strong> {"⭐".repeat(review.rating)}</p>
-		      <p>{review.comment}</p>
-		    </div>
-		  ))
-		)}
+        {Array.isArray(reviews) && reviews.length === 0 ? (
+          <p>No reviews yet...</p>
+        ) : (
+          Array.isArray(reviews) &&
+          reviews.map((review, index) => (
+            <div key={index}>
+              <p><strong>Rating:</strong> {"⭐".repeat(review.rating)}</p>
+              <p>{review.comment}</p>
+            </div>
+          ))
+        )}
 
-
-<form onSubmit={handleReviewSubmit}>
-        <h4>Leave a Review</h4>
-        <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
-          {[1, 2, 3, 4, 5].map((num) => (
-            <option key={num} value={num}>
-              {num} Star{num > 1 ? "s" : ""}
-            </option>
-          ))}
-        </select>
-        <textarea
-          value={newReview}
-          onChange={(e) => setNewReview(e.target.value)}
-          placeholder="Write your review here..."
-        ></textarea>
-        <button type="submit">Submit Review</button>
-      </form>
-    </div>
+        <form onSubmit={handleReviewSubmit}>
+          <h4>Leave a Review</h4>
+          <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+            {[1, 2, 3, 4, 5].map((num) => (
+              <option key={num} value={num}>
+                {num} Star{num > 1 ? "s" : ""}
+              </option>
+            ))}
+          </select>
+          <textarea
+            value={newReview}
+            onChange={(e) => setNewReview(e.target.value)}
+            placeholder="Write your review here..."
+          ></textarea>
+          <button type="submit">Submit Review</button>
+        </form>
+      </div>
     </div>
   );
 };
 export default VehicleDetailsPage;
-
