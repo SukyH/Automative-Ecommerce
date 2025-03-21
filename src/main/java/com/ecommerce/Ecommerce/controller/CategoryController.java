@@ -1,5 +1,6 @@
 package com.ecommerce.Ecommerce.controller;
 
+import com.ecommerce.Ecommerce.dto.CategoryDto;
 import com.ecommerce.Ecommerce.entity.Category;
 import com.ecommerce.Ecommerce.service.interf.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +26,12 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
-    @PostMapping("create")
-
-    public ResponseEntity<Category> createCategory(@RequestBody Category category) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(category));
+    @PostMapping("/create")
+    public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto categoryDto) {
+        CategoryDto createdCategory = categoryService.createCategory(categoryDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Category> getCategoryById(@PathVariable Long id) throws Exception {

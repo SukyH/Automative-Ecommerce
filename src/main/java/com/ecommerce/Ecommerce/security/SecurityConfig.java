@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                 		//might add later whenwe add admin page
                 		.requestMatchers("/admin/**").hasRole("ADMIN") 
-                        .requestMatchers("/auth/**", "/category/**", "/product/**", "/order/**", "/api/users/**", "/catalog/**", "/items/**", "/orders/**", "/hot-deals/**", "/address/**", "/api/wishlist/**", "/api/sales/**", "/api/usage/**", "/api/visit/**").permitAll()
+                        .requestMatchers("/auth/**", "/category/**", "/product/**", "/order/**", "/api/users/**", "/catalog/**", "/items/**", "/orders/**", "/hot-deals/**", "/address/**", "/api/wishlist/**", "/api/sales/**", "/api/usage/**", "/api/visit/**", "/categories/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(manager-> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

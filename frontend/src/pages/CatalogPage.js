@@ -20,9 +20,16 @@ const CatalogPage = () => {
       try {
         setLoading(true);
   
-        const vehicleResponse = await ApiService.getAllItems();
-        setVehicles(vehicleResponse.content);
-        setFilteredVehicles(vehicleResponse.content);
+			const vehicleResponse = await ApiService.getAllItems();
+		console.log("Vehicle Response:", vehicleResponse);  
+
+		      if (vehicleResponse && vehicleResponse.content) {
+		        setVehicles(vehicleResponse.content);
+		        setFilteredVehicles(vehicleResponse.content);
+		      } else {
+		        setVehicles([]); // Ensure vehicles is always an array
+		        setFilteredVehicles([]);
+		      }
   
         const hotDealsResponse = await ApiService.getAllHotDeals();
         setHotDeals(hotDealsResponse);
@@ -53,20 +60,12 @@ const CatalogPage = () => {
   // Filter vehicles based on search and category
   const filterVehicles = (search, category) => {
     let filtered = vehicles;
-
-    // Filter by search term
     if (search) {
       filtered = filtered.filter(vehicle =>
         vehicle.model.toLowerCase().includes(search.toLowerCase())
       );
     }
-
-    // Filter by category
-    if (category) {
-      filtered = filtered.filter(vehicle => vehicle.category === category);
-    }
-
-    setFilteredVehicles(filtered);
+    setFilteredVehicles(filtered); // Show all items when "All Categories"
   };
    // Handle Select Vehicle for Comparison
    const handleSelectVehicle = (vehicle) => {

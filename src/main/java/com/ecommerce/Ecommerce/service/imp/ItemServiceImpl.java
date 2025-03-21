@@ -43,6 +43,7 @@ public class ItemServiceImpl implements ItemService {
 		item.setInteriorColor(itemDto.getInteriorColor());
 		item.setExteriorColor(itemDto.getExteriorColor());
 		item.setFabric(itemDto.getFabric());
+
 		// Set other fields as needed, then save it to DB
 		return itemRepo.save(item);
 	}
@@ -131,6 +132,7 @@ public class ItemServiceImpl implements ItemService {
 				item.getInteriorColor(),   
 				item.getExteriorColor(),  
 				item.getFabric() 
+			
 				);
 	}
 
@@ -186,7 +188,8 @@ public class ItemServiceImpl implements ItemService {
 						item.getVehicleHistory(), 
 						item.getInteriorColor(),  
 						item.getExteriorColor(),  
-						item.getFabric()         
+						item.getFabric() 
+						
 						))
 				.collect(Collectors.toList());
 	}

@@ -9,6 +9,8 @@ import java.util.List;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters.LocalDateTimeConverter;
 
 import com.ecommerce.Ecommerce.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -40,9 +42,10 @@ public class Item {
     @ElementCollection
     private List<String> reviews = new ArrayList<>();
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name= "category_id")
-	private Category category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name= "category_id")
+    private Category category;
+
 	
 	
 	@ManyToOne
