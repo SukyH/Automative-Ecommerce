@@ -82,21 +82,30 @@ const CatalogPage = () => {
 
     setFilteredVehicles(filtered);
   };
+  
+ // Sort by Price
+ const handleSortByPrice = async (order) => {
+	try {
+  	const sortedData = await ApiService.getSortedItemsByPrice(order);
+  	setFilteredVehicles(sortedData);
+	} catch (error) {
+  	console.error("Error sorting by price:", error);
+  	setError("Failed to sort vehicles by price.");
+	}
+  };
 
-  const VehicleCard = ({ vehicle }) => (
-    <div className="vehicle-card">
-      <img src={vehicle.imageUrl} alt={vehicle.model} />
-      <h3>{vehicle.model}</h3>
-      <p>{vehicle.brand}</p>
-      <p>${vehicle.price}</p>
-      <button
-        className="view-details-button"
-        onClick={() => navigate(`/vehicle-details/${vehicle.id}`)}
-      >
-        View Details
-      </button>
-    </div>
-  );
+  // Sort by Mileage
+  const handleSortByMileage = async (order) => {
+	try {
+  	const sortedData = await ApiService.getSortedItemsByMileage(order);
+  	setFilteredVehicles(sortedData);
+	} catch (error) {
+  	console.error("Error sorting by mileage:", error);
+  	setError("Failed to sort vehicles by mileage.");
+	}
+  };
+
+
   
   return (
     <div>
@@ -143,6 +152,16 @@ const CatalogPage = () => {
           Apply Filters
         </button>
       </div>
+
+
+      
+  	{/* Sorting Buttons */}
+  	<div className="sorting-buttons">
+    	<button onClick={() => handleSortByPrice("asc")}>Sort by Price ↑</button>
+    	<button onClick={() => handleSortByPrice("desc")}>Sort by Price ↓</button>
+    	<button onClick={() => handleSortByMileage("asc")}>Sort by Mileage ↑</button>
+    	<button onClick={() => handleSortByMileage("desc")}>Sort by Mileage ↓</button>
+  	</div>
 
 	  {/* Hot Deals Section */}
 	  <div>
