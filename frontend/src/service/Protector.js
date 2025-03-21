@@ -1,39 +1,43 @@
 import React, { useEffect, useState } from 'react';
-import { Navigate, Route } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
-const Protector = ({ component: Component, isAdminRequired, ...rest }) => {
+const Protector = ({ Component, isAdminRequired }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [checkedAuth, setCheckedAuth] = useState(false);
 
   useEffect(() => {
-    const authToken = localStorage.getItem('token');  // Use 'token' to check auth status
-    const role = localStorage.getItem('role');  // Role stored in localStorage
+    const authToken = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
 
     if (authToken) {
       setIsAuthenticated(true);
       if (role) {
-        setIsAdmin(role === 'ADMIN');  // Check if the role is 'ADMIN'
+        setIsAdmin(role === 'ADMIN');
       }
     }
+
+    setCheckedAuth(true);
   }, []);
 
-  return (
-    <Route
-      {...rest}
-      element={
-        isAuthenticated && (!isAdminRequired || isAdmin) ? (
-          <Component />
-        ) : isAuthenticated ? (
-          <div>
-            <h2>Not Authorized</h2>
-            <p>You don't have permission to access this page.</p>
-          </div>
-        ) : (
-          <Navigate to="/login" />
-        )
-      }
-    />
-  );
+  if (!checkedAuth) {
+    return <div>Checking authentication...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  if (isAdminRequired && !isAdmin) {
+    return (
+      <div>
+        <h2>Not Authorized</h2>
+        <p>You don't have permission to access this page.</p>
+      </div>
+    );
+  }
+
+  return <Component />;
 };
 
 export default Protector;

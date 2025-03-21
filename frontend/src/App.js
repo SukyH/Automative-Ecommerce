@@ -46,7 +46,7 @@ function App() {
             path="/admin"
             element={
               <Protector
-                component={AdminDashboard}
+                Component={AdminDashboard}
                 isAdminRequired={true}
               />
             }
@@ -55,7 +55,7 @@ function App() {
             path="/admin/analytics"
             element={
               <Protector
-                component={AnalyticsPage}
+                Component={AnalyticsPage}
                 isAdminRequired={true}
               />
             }
@@ -64,7 +64,7 @@ function App() {
             path="/admin/orders"
             element={
               <Protector
-                component={OrderManagement}
+                Component={OrderManagement}
                 isAdminRequired={true}
               />
             }
@@ -73,7 +73,7 @@ function App() {
             path="/admin/vehicles"
             element={
               <Protector
-                component={VehicleManagement}
+                Component={VehicleManagement}
                 isAdminRequired={true}
               />
             }
