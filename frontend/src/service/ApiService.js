@@ -311,7 +311,7 @@ static async getItemsByBrand(brand) {
 
 
    static async getItemById(itemId) {
-       const response = await axios.get(`${this.BASE_URL}/catalog/items/${itemId}`);
+       const response = await axios.get(`${this.BASE_URL}/catalog/items/details/${itemId}`);
        return response.data;
    }
      //start from here
@@ -433,7 +433,7 @@ static async updateOrderStatus(orderId, status) {
    // Fetch item reviews
 static async getItemReviews(itemId) {
     try {
-        const response = await axios.get(`${this.BASE_URL}/catalog/items/${itemId}/reviews`, {
+        const response = await axios.get(`${this.BASE_URL}/catalog/${itemId}/reviews`, {
             headers: this.getHeader(),
         });
         return response.data;
@@ -447,7 +447,7 @@ static async getItemReviews(itemId) {
 static async submitReview(itemId, rating, comment) {
     try {
         const response = await axios.post(
-            `${this.BASE_URL}/catalog/items/${itemId}/reviews`,
+            `${this.BASE_URL}/catalog/${itemId}/reviews`,
             { rating, comment },
             {
                 headers: this.getHeader(),

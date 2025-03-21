@@ -152,7 +152,7 @@ public class ItemController {
     }
 
 
-    @GetMapping("/catalog/items/filter")
+    @GetMapping("/items/filter")
     public ResponseEntity<List<ItemDto>> filterItems(
         @RequestParam(required = false) String brand,
         @RequestParam(required = false) String shape,

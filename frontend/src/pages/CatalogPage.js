@@ -16,8 +16,6 @@ const CatalogPage = () => {
   const [vehicleHistory, setVehicleHistory] = useState("");
   const [hotDeals, setHotDeals] = useState([]);
 
-
-
   const navigate = useNavigate();
 
   // Fetch vehicles and hot deals on load
@@ -55,7 +53,6 @@ const CatalogPage = () => {
     fetchVehiclesAndDeals();
   }, []);
 
-
   // Handle Search
   const handleSearch = (e) => {
     const value = e.target.value;
@@ -70,43 +67,64 @@ const CatalogPage = () => {
     setFilteredVehicles(filtered);
   };
 
-  // Apply Filters
-  const handleFilter = () => {
-    let filtered = vehicles;
-
-    if (brand) filtered = filtered.filter((v) => v.brand === brand);
-    if (shape) filtered = filtered.filter((v) => v.shape === shape);
-    if (modelYear) filtered = filtered.filter((v) => v.modelYear === modelYear);
-    if (vehicleHistory)
-      filtered = filtered.filter((v) => v.vehicleHistory === vehicleHistory);
-
-    setFilteredVehicles(filtered);
+  // Apply Filters using individual APIs
+  const handleFilter = async () => {
+    try {
+      if (brand) {
+        const brandFiltered = await ApiService.getItemsByBrand(brand);
+        setFilteredVehicles(brandFiltered);
+        return;
+      }
+      if (shape) {
+        const shapeFiltered = await ApiService.getItemsByShape(shape);
+        setFilteredVehicles(shapeFiltered);
+        return;
+      }
+      if (modelYear) {
+        const yearFiltered = await ApiService.getItemsByModelYear(modelYear);
+        setFilteredVehicles(yearFiltered);
+        return;
+      }
+      if (vehicleHistory) {
+        if (vehicleHistory === "no-damage" || vehicleHistory === null) {
+          const noDamage = await ApiService.getItemsByVehicleHistoryNoDamage();
+          setFilteredVehicles(noDamage);
+        } else {
+          const withDamage = await ApiService.getItemsByVehicleHistoryWithDamage();
+          setFilteredVehicles(withDamage);
+        }
+        return;
+      }
+      // If no filter applied, show all
+      setFilteredVehicles(vehicles);
+    } catch (err) {
+      console.error("Error applying filter:", err);
+      setError("Failed to apply filters.");
+    }
   };
-  
- // Sort by Price
- const handleSortByPrice = async (order) => {
-	try {
-  	const sortedData = await ApiService.getSortedItemsByPrice(order);
-  	setFilteredVehicles(sortedData);
-	} catch (error) {
-  	console.error("Error sorting by price:", error);
-  	setError("Failed to sort vehicles by price.");
-	}
+
+  // Sort by Price
+  const handleSortByPrice = async (order) => {
+    try {
+      const sortedData = await ApiService.getSortedItemsByPrice(order);
+      setFilteredVehicles(sortedData);
+    } catch (error) {
+      console.error("Error sorting by price:", error);
+      setError("Failed to sort vehicles by price.");
+    }
   };
 
   // Sort by Mileage
   const handleSortByMileage = async (order) => {
-	try {
-  	const sortedData = await ApiService.getSortedItemsByMileage(order);
-  	setFilteredVehicles(sortedData);
-	} catch (error) {
-  	console.error("Error sorting by mileage:", error);
-  	setError("Failed to sort vehicles by mileage.");
-	}
+    try {
+      const sortedData = await ApiService.getSortedItemsByMileage(order);
+      setFilteredVehicles(sortedData);
+    } catch (error) {
+      console.error("Error sorting by mileage:", error);
+      setError("Failed to sort vehicles by mileage.");
+    }
   };
 
-
-  
   return (
     <div>
       <h1>Catalog</h1>
@@ -201,14 +219,14 @@ const CatalogPage = () => {
       	<p>{error}</p>
     	) : (
       	filteredVehicles.map((vehicle) => (
-        	<div key={vehicle.id} className="vehicle-card">
+        	<div key={vehicle.vid} className="vehicle-card">
           	<img src={vehicle.imageUrl} alt={vehicle.model} />
           	<h3>{vehicle.model}</h3>
           	<p>{vehicle.brand}</p>
           	<p>${vehicle.price}</p>
           	<button
             	className="view-details-button"
-            	onClick={() => navigate(`/vehicle-details/${vehicle.id}`)}
+            	onClick={() => navigate(`/vehicle-details/${vehicle.vid}`)}
           	>
             	View Details
           	</button>

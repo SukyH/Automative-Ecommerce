@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import ApiService from '../service/ApiService';
 
 const VehicleDetailsPage = () => {
-  const { vehicleId } = useParams();
+  const { id: vehicleId } = useParams();
   const [vehicle, setVehicle] = useState(null);
   const [loanAmount, setLoanAmount] = useState(0);
   const [downPayment, setDownPayment] = useState(0);
@@ -19,13 +19,14 @@ const VehicleDetailsPage = () => {
     // Fetch vehicle details and reviews
     const fetchVehicleDetails = async () => {
       try {
-        const response = await ApiService.getItemById(vehicleId);
-        setVehicle(response.data);
-        setLoanAmount(response.data.price); // Default loan amount is vehicle price
-      } catch (err) {
-        console.error('Error fetching vehicle details:', err);
-        setError('Failed to load vehicle details.');
-      }
+        const vehicleData = await ApiService.getItemById(vehicleId);
+        setVehicle(vehicleData);
+        setLoanAmount(vehicleData.price); // Default loan amount is vehicle price
+      } 		catch (err) {
+		  console.error('Error fetching vehicle details:', err.response || err);
+		  setError('Failed to load vehicle details.');
+		}
+
     };
 
     const fetchReviews = async () => {
@@ -120,16 +121,18 @@ const VehicleDetailsPage = () => {
       {/* Reviews Section */}
       <div>
         <h3>Reviews</h3>
-        {reviews.length === 0 ? (
-          <p>No reviews yet. Be the first to review this vehicle!</p>
-        ) : (
-          reviews.map((review, index) => (
-            <div key={index}>
-              <p><strong>Rating:</strong> {"⭐".repeat(review.rating)}</p>
-              <p>{review.comment}</p>
-            </div>
-          ))
-        )}
+		{Array.isArray(reviews) && reviews.length === 0 ? (
+		  <p>No reviews yet...</p>
+		) : (
+		  Array.isArray(reviews) &&
+		  reviews.map((review, index) => (
+		    <div key={index}>
+		      <p><strong>Rating:</strong> {"⭐".repeat(review.rating)}</p>
+		      <p>{review.comment}</p>
+		    </div>
+		  ))
+		)}
+
 
 <form onSubmit={handleReviewSubmit}>
         <h4>Leave a Review</h4>
