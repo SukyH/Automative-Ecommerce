@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import ApiService from '../service/ApiService';
 
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import ApiService from "../service/ApiService";
 
 
 const CatalogPage = () => {
@@ -9,98 +9,95 @@ const CatalogPage = () => {
   const [filteredVehicles, setFilteredVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [brand, setBrand] = useState("");
+  const [shape, setShape] = useState("");
+  const [modelYear, setModelYear] = useState("");
+  const [vehicleHistory, setVehicleHistory] = useState("");
   const [hotDeals, setHotDeals] = useState([]);
-  const [selectedVehicles, setSelectedVehicles] = useState([]);
-  const history = useNavigate();
-  
+
+
+
+  const navigate = useNavigate();
+
+  // Fetch vehicles and hot deals on load
   useEffect(() => {
     const fetchVehiclesAndDeals = async () => {
       try {
         setLoading(true);
-  
-			const vehicleResponse = await ApiService.getAllItems();
-		console.log("Vehicle Response:", vehicleResponse);  
 
-		      if (vehicleResponse && vehicleResponse.content) {
-		        setVehicles(vehicleResponse.content);
-		        setFilteredVehicles(vehicleResponse.content);
-		      } else {
-		        setVehicles([]); // Ensure vehicles is always an array
-		        setFilteredVehicles([]);
-		      }
-  
+        const vehicleResponse = await ApiService.getAllItems();
+        if (vehicleResponse && Array.isArray(vehicleResponse)) {
+          setVehicles(vehicleResponse);
+          setFilteredVehicles(vehicleResponse);
+        } else if (vehicleResponse && Array.isArray(vehicleResponse.content)) {
+          setVehicles(vehicleResponse.content);
+          setFilteredVehicles(vehicleResponse.content);
+        } else {
+          setVehicles([]);
+          setFilteredVehicles([]);
+        }
+
         const hotDealsResponse = await ApiService.getAllHotDeals();
-        setHotDeals(hotDealsResponse);
-  
+        setHotDeals(Array.isArray(hotDealsResponse) ? hotDealsResponse : []);
+
         setLoading(false);
       } catch (err) {
         console.error('Error fetching data:', err);
         setError('Failed to load data.');
+        setVehicles([]);
+        setFilteredVehicles([]);
+        setHotDeals([]);
         setLoading(false);
       }
     };
+
     fetchVehiclesAndDeals();
   }, []);
-  
+
 
   // Handle Search
   const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-    filterVehicles(e.target.value, selectedCategory);
-  };
+    const value = e.target.value;
+    setSearchTerm(value);
 
-  // Handle Category Selection
-  const handleCategoryChange = (e) => {
-    setSelectedCategory(e.target.value);
-    filterVehicles(searchTerm, e.target.value);
-  };
-
-  // Filter vehicles based on search and category
-  const filterVehicles = (search, category) => {
     let filtered = vehicles;
-    if (search) {
-      filtered = filtered.filter(vehicle =>
-        vehicle.model.toLowerCase().includes(search.toLowerCase())
+    if (value.trim()) {
+      filtered = vehicles.filter((vehicle) =>
+        vehicle.model.toLowerCase().includes(value.toLowerCase())
       );
     }
-    setFilteredVehicles(filtered); // Show all items when "All Categories"
-  };
-   // Handle Select Vehicle for Comparison
-   const handleSelectVehicle = (vehicle) => {
-    if (selectedVehicles.length < 3) {
-      setSelectedVehicles([...selectedVehicles, vehicle]);
-    } else {
-      alert("You can only compare up to 3 vehicles.");
-    }
+    setFilteredVehicles(filtered);
   };
 
- // Function to remove a vehicle from comparison
- const handleRemoveVehicle = (vehicleId) => {
-  setSelectedVehicles(selectedVehicles.filter(vehicle => vehicle.id !== vehicleId));
-};
- // Render comparison details
- const comparisonDetails = selectedVehicles.length > 0 && (
-  <div>
-    <h2>Comparison</h2>
-    <div className="comparison-table">
-      {selectedVehicles.map(vehicle => (
-        <div key={vehicle.id} className="vehicle-comparison">
-          <h3>{vehicle.model}</h3>
-          <img src={vehicle.imageUrl} alt={vehicle.model} />
-          <p><strong>Brand:</strong> {vehicle.brand}</p>
-          <p><strong>Price:</strong> ${vehicle.price}</p>
-          <p><strong>Model Year:</strong> {vehicle.modelYear}</p>
-          <p><strong>Rating:</strong> {vehicle.rating}</p>
-          <p><strong>Reviews:</strong> {vehicle.reviews}</p>
-          <button onClick={() => handleRemoveVehicle(vehicle.id)}>Remove from Comparison</button>
-        </div>
-      ))}
+  // Apply Filters
+  const handleFilter = () => {
+    let filtered = vehicles;
+
+    if (brand) filtered = filtered.filter((v) => v.brand === brand);
+    if (shape) filtered = filtered.filter((v) => v.shape === shape);
+    if (modelYear) filtered = filtered.filter((v) => v.modelYear === modelYear);
+    if (vehicleHistory)
+      filtered = filtered.filter((v) => v.vehicleHistory === vehicleHistory);
+
+    setFilteredVehicles(filtered);
+  };
+
+  const VehicleCard = ({ vehicle }) => (
+    <div className="vehicle-card">
+      <img src={vehicle.imageUrl} alt={vehicle.model} />
+      <h3>{vehicle.model}</h3>
+      <p>{vehicle.brand}</p>
+      <p>${vehicle.price}</p>
+      <button
+        className="view-details-button"
+        onClick={() => navigate(`/vehicle-details/${vehicle.id}`)}
+      >
+        View Details
+      </button>
     </div>
-  </div>
-);
- 
+  );
+  
   return (
     <div>
       <h1>Catalog</h1>
@@ -108,71 +105,100 @@ const CatalogPage = () => {
       {/* Search Bar */}
       <input
         type="text"
-        placeholder="Search by model"
+        placeholder="Search vehicles..."
         value={searchTerm}
         onChange={handleSearch}
       />
 
-      {/* Category Dropdown */}
-      <select onChange={handleCategoryChange} value={selectedCategory}>
-        <option value="">All Categories</option>
-        <option value="SUV">SUV</option>
-        <option value="Sedan">Sedan</option>
-        <option value="Truck">Truck</option>
-        <option value="Electric">Electric</option>
-        {/* Add more categories as needed */}
-      </select>
+      {/* Filter Section */}
+      <div className="filters-container">
+        <input
+          type="text"
+          placeholder="Brand"
+          value={brand}
+          onChange={(e) => setBrand(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Shape"
+          value={shape}
+          onChange={(e) => setShape(e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Model Year"
+          value={modelYear}
+          onChange={(e) => setModelYear(e.target.value)}
+        />
+        <select
+          onChange={(e) => setVehicleHistory(e.target.value)}
+          value={vehicleHistory}
+        >
+          <option value="">Vehicle History</option>
+          <option value="no-damage">No Damage</option>
+          <option value="with-damage">With Damage</option>
+        </select>
 
-      {/* Hot Deals Section */}
-      <div>
-  <h2>🔥 Hot Deals</h2>
-  <div className="vehicle-grid">
-    {hotDeals.length === 0 ? (
-      <p>No hot deals available at the moment.</p>
-    ) : (
-      hotDeals.map(deal => (
-        <Link key={deal.id} to={`/vehicle/${deal.item.id}`}>
-          <div className="vehicle-card hot-deal-card">
-            <img src={deal.item.imageUrl} alt={deal.item.model} />
-            <h3>{deal.item.model}</h3>
-            <p className="original-price">${deal.item.price}</p>
-            <p className="discounted-price">
-              ${deal.item.price - deal.item.price * (deal.discount / 100)}
-            </p>
-            <span className="deal-tag">🔥 {deal.discount}% OFF!</span>
-          </div>
-        </Link>
-      ))
-    )}
-  </div>
-</div>
-
-
-      {/* Catalog Grid */}
-      <div className="vehicle-grid">
-        {loading ? (
-          <p>Loading...</p>
-        ) : error ? (
-          <p>{error}</p>
-        ) : (
-          filteredVehicles.map(vehicle => (
-            <Link key={vehicle.id} to={`/vehicle/${vehicle.id}`}>
-              <div className="vehicle-card">
-                <img src={vehicle.imageUrl} alt={vehicle.model} />
-                <p>{vehicle.model}</p>
-                <p>${vehicle.price}</p>
-                <button onClick={() => handleSelectVehicle(vehicle)}>Compare</button>
-              </div>
-            </Link>
-          ))
-        )}
+        <button className="filter-button" onClick={handleFilter}>
+          Apply Filters
+        </button>
       </div>
-    {/* Display comparison details*/}
-    {comparisonDetails}
-    </div>
+
+	  {/* Hot Deals Section */}
+	  <div>
+	    <h2>🔥 Hot Deals</h2>
+	    <div className="vehicle-grid">
+	      {Array.isArray(hotDeals) && hotDeals.length > 0 ? (
+	        hotDeals.map((deal) => (
+	          <div key={deal.id} className="vehicle-card hot-deal-card">
+	            <img src={deal.item?.imageUrl} alt={deal.item?.model || 'Vehicle'} />
+	            <h3>{deal.item?.model}</h3>
+	            <p className="original-price">${deal.item?.price}</p>
+	            <p className="discounted-price">
+	              ${deal.item?.price - deal.item?.price * (deal.discount / 100)}
+	            </p>
+	            <span className="deal-tag">🔥 {deal.discount}% OFF!</span>
+	            <button
+	              className="view-details-button"
+	              onClick={() => navigate(`/vehicle-details/${deal.item?.id}`)}
+	            >
+	              View Details
+	            </button>
+	          </div>
+	        ))
+	      ) : (
+	        <p>No hot deals available at the moment.</p>
+	      )}
+	    </div>
+	  </div>
+
+
+  	{/* All Vehicles Section */}
+  	<h2>🚘 All Vehicles</h2>
+  	<div className="vehicle-grid">
+    	{loading ? (
+      	<p>Loading vehicles...</p>
+    	) : error ? (
+      	<p>{error}</p>
+    	) : (
+      	filteredVehicles.map((vehicle) => (
+        	<div key={vehicle.id} className="vehicle-card">
+          	<img src={vehicle.imageUrl} alt={vehicle.model} />
+          	<h3>{vehicle.model}</h3>
+          	<p>{vehicle.brand}</p>
+          	<p>${vehicle.price}</p>
+          	<button
+            	className="view-details-button"
+            	onClick={() => navigate(`/vehicle-details/${vehicle.id}`)}
+          	>
+            	View Details
+          	</button>
+        	</div>
+      	))
+    	)}
+  	</div>
+	</div>
   );
 };
-
-
 
 export default CatalogPage;

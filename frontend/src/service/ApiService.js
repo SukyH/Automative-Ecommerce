@@ -241,12 +241,58 @@ static isAdmin() {
     });
     return response.data;
 }
-static async filterItems(filters) {
+/*static async filterItems(filters) {
     const response = await axios.get(`${this.BASE_URL}/catalog/items/filter`, {
         params: filters
     });
     return response.data;
-}
+}*/
+ 
+static async getItemsByBrand(brand) {
+	const response = await axios.get(`${this.BASE_URL}/items/brand/${brand}`);
+	return response.data;
+  }
+
+  static async getSortedItemsByPrice(order) {
+	const response = await axios.get(`${this.BASE_URL}/items/sort`, {
+  	params: { order }
+	});
+	return response.data;
+  }
+
+  static async getSortedItemsByMileage(order) {
+	const response = await axios.get(`${this.BASE_URL}/items/sort/mileage`, {
+  	params: { order }
+	});
+	return response.data;
+  }
+
+  static async getItemsByShape(shape) {
+	const response = await axios.get(`${this.BASE_URL}/items/shape/${shape}`);
+	return response.data;
+  }
+
+  static async getItemsByModelYear(year) {
+	const response = await axios.get(`${this.BASE_URL}/items/year/${year}`);
+	return response.data;
+  }
+
+  static async getItemsByVehicleHistoryNoDamage() {
+	const response = await axios.get(`${this.BASE_URL}/items/history/no-damage`);
+	return response.data;
+  }
+
+  static async getItemsByVehicleHistoryWithDamage() {
+	const response = await axios.get(`${this.BASE_URL}/items/history/with-damage`);
+	return response.data;
+  }
+
+  static async filterItems({ brand, shape, modelYear, vehicleHistory }) {
+	const response = await axios.get(`${this.BASE_URL}/catalog/items/filter`, {
+  	params: { brand, shape, modelYear, vehicleHistory }
+	});
+	return response.data;
+  }
 
 
 
@@ -380,31 +426,7 @@ static async updateOrderStatus(orderId, status) {
        });
        return response.data; // Image URL
    }
-//reviews api
 
-static async getVehicleReviews(itemId) {
-    try {
-        const response = await axios.get(`${this.BASE_URL}/vehicles/${itemId}/reviews`, {
-            headers: this.getHeader()
-        });
-        return response.data;  
-    } catch (error) {
-        console.error('Error fetching vehicle reviews:', error);
-        throw error;  
-    }
-}
-
-static async submitReview(itemId, reviewData) {
-    try {
-        const response = await axios.post(`${this.BASE_URL}/vehicles/${itemId}/reviews`, reviewData, {
-            headers: this.getHeader()
-        });
-        return response.data;  
-    } catch (error) {
-        console.error('Error submitting review:', error);
-        throw error;  
-    }
-}
 
 
    //reviews api
@@ -437,29 +459,20 @@ static async submitReview(itemId, rating, comment) {
         throw error;
     }
 }
-static async removeFromWishlist(itemId) {
-       try {
-           const response = await axios.delete(`${this.BASE_URL}/wishlist/${itemId}`, {
-               headers: this.getHeader(),
-           });
-           return response.data;
-       } catch (err) {
-           console.error("Error removing vehicle from wishlist:", err);
-           throw err;
-       }
-   }
+
    //  Fetch all hot deals
-  static async getAllHotDeals() {
-	try {
-  	const response = await axios.get(`${this.BASE_URL}/hot-deals/all`, {
-    	headers: this.getHeader(),
-  	});
-  	return response.data;
-	} catch (err) {
-  	console.error('Error fetching hot deals:', err);
-  	throw err;
-	}
-  }
+   static async getAllHotDeals() {
+     try {
+       const response = await axios.get(`${this.BASE_URL}/hot-deals/all`, {
+         headers: this.getHeader(),
+       });
+       return Array.isArray(response.data) ? response.data : []; // <-- Safeguard here
+     } catch (err) {
+       console.error('Error fetching hot deals:', err);
+       return []; // return empty array instead of throwing
+     }
+   }
+
 
   // Add a new hot deal (Admin only)
   static async addHotDeal(itemId, discount) {
