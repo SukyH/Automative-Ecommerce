@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import ApiService from '../service/ApiService';
 
 const VehicleDetailsPage = () => {
   const { vehicleId } = useParams();
+  const navigate = useNavigate();
   const [vehicle, setVehicle] = useState(null);
   const [loanAmount, setLoanAmount] = useState(0);
   const [downPayment, setDownPayment] = useState(0);
   const [interestRate, setInterestRate] = useState(5);  // Default interest rate
   const [loanTerm, setLoanTerm] = useState(60);  // Default loan term (months)
   const [monthlyPayment, setMonthlyPayment] = useState(0);
+  const [cart, setCart] = useState(JSON.parse(localStorage.getItem('cart')) || []); // Get cart from localStorage or empty array
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState('');
-  const [rating, setRating] = useState(5)
-  const [error, setError] = useState(null);
+  const [rating, setRating] = useState(5);
 
   useEffect(() => {
-    // Fetch vehicle details and reviews
     const fetchVehicleDetails = async () => {
       try {
         const response = await ApiService.getItemById(vehicleId);
@@ -24,7 +24,6 @@ const VehicleDetailsPage = () => {
         setLoanAmount(response.data.price); // Default loan amount is vehicle price
       } catch (err) {
         console.error('Error fetching vehicle details:', err);
-        setError('Failed to load vehicle details.');
       }
     };
 
@@ -34,7 +33,6 @@ const VehicleDetailsPage = () => {
         setReviews(response.data);
       } catch (err) {
         console.error('Error fetching reviews:', err);
-        setError('Failed to load reviews.');
       }
     };
 
@@ -60,7 +58,7 @@ const VehicleDetailsPage = () => {
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     try {
-      const reviewData = { review: newReview };
+      const reviewData = { review: newReview, rating: rating };
       await ApiService.submitReview(vehicleId, reviewData); // Submit the review
       setReviews([...reviews, reviewData]); // Optimistic update of reviews
       setNewReview(''); // Clear the input field
@@ -69,12 +67,24 @@ const VehicleDetailsPage = () => {
     }
   };
 
-  // Show error message if API failed
-  if (error) {
-    return <div>{error}</div>;
-  }
+  // Handle Add to Cart
+  const handleAddToCart = () => {
+    const cartItem = {
+      id: vehicle.id,
+      name: vehicle.name,
+      price: vehicle.price,
+      quantity: 1,  // Default quantity
+      imageUrl: vehicle.imageUrl,
+    };
 
-  if (!vehicle) return <p>Loading...</p>; // Show loading if vehicle data is not yet loaded
+    const updatedCart = [...cart, cartItem];
+    setCart(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));  // Save the cart to localStorage
+    alert('Vehicle added to cart!');
+  };
+
+  // Show loading message if vehicle is not yet loaded
+  if (!vehicle) return <p>Loading...</p>;
 
   return (
     <div>
@@ -131,25 +141,29 @@ const VehicleDetailsPage = () => {
           ))
         )}
 
-<form onSubmit={handleReviewSubmit}>
-        <h4>Leave a Review</h4>
-        <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
-          {[1, 2, 3, 4, 5].map((num) => (
-            <option key={num} value={num}>
-              {num} Star{num > 1 ? "s" : ""}
-            </option>
-          ))}
-        </select>
-        <textarea
-          value={newReview}
-          onChange={(e) => setNewReview(e.target.value)}
-          placeholder="Write your review here..."
-        ></textarea>
-        <button type="submit">Submit Review</button>
-      </form>
-    </div>
+        <form onSubmit={handleReviewSubmit}>
+          <h4>Leave a Review</h4>
+          <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+            {[1, 2, 3, 4, 5].map((num) => (
+              <option key={num} value={num}>
+                {num} Star{num > 1 ? "s" : ""}
+              </option>
+            ))}
+          </select>
+          <textarea
+            value={newReview}
+            onChange={(e) => setNewReview(e.target.value)}
+            placeholder="Write your review here..."
+          ></textarea>
+          <button type="submit">Submit Review</button>
+        </form>
+      </div>
+
+      {/* Add to Cart Button */}
+      <button onClick={handleAddToCart}>Add to Cart</button>
     </div>
   );
 };
+
 export default VehicleDetailsPage;
 
