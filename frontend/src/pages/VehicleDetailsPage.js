@@ -14,8 +14,34 @@ const VehicleDetailsPage = () => {
   const [newReview, setNewReview] = useState('');
   const [rating, setRating] = useState(5)
   const [error, setError] = useState(null);
+  const [ipAddress, setIpAddress] = useState('');
+  const [isInCart, setIsInCart] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
+  const [addingToCart, setAddingToCart] = useState(false);
+
+  // Get IP address when component loads
+  useEffect(() => {
+    const getIp = async () => {
+      try {
+        const response = await ApiService.getIpAddress();
+        setIpAddress(response.ip);
+      } catch (error) {
+        console.error('Error getting IP:', error);
+      }
+    };
+    getIp();
+  }, []);
+  
+  // Track view when product loads and IP is available
+  useEffect(() => {
+    if (ipAddress && vehicleId) {
+      ApiService.trackVisit(ipAddress, vehicleId, 'VIEW');
+    }
+  }, [ipAddress, vehicleId]);
+
 
   useEffect(() => {
+     
     // Fetch vehicle details and reviews
     const fetchVehicleDetails = async () => {
       try {
@@ -40,8 +66,48 @@ const VehicleDetailsPage = () => {
 
     fetchVehicleDetails();
     fetchReviews();
+    fetchCartItems();
   }, [vehicleId]);
 
+  // Fetch cart items to check if vehicle is already in cart
+  const fetchCartItems = async () => {
+    const userId = localStorage.getItem('userId');
+    const activeOrderId = localStorage.getItem('activeOrderId');
+
+    if (activeOrderId) {
+      try {
+        const items = await ApiService.getAllItemsInOrder(activeOrderId);
+        setCartItems(items);
+        
+        // Check if this vehicle is in the cart
+        const inCart = items.some(item => 
+          (item.id === vehicleId) || 
+          (item.itemId === vehicleId) || 
+          (item.vid === vehicleId)
+        );
+        setIsInCart(inCart);
+      } catch (error) {
+        console.error('Error fetching cart items:', error);
+        // For guest users, fall back to localStorage
+        if (!userId) {
+          const guestCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
+          setCartItems(guestCart);
+          
+          // Check if this vehicle is in the guest cart
+          const inCart = guestCart.some(item => item.id === vehicleId);
+          setIsInCart(inCart);
+        }
+      }
+    } else if (!userId) {
+      // For guest users without an order, use localStorage
+      const guestCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
+      setCartItems(guestCart);
+      
+      // Check if this vehicle is in the guest cart
+      const inCart = guestCart.some(item => item.id === vehicleId);
+      setIsInCart(inCart);
+    }
+  };
   // Loan Calculator Logic
   const calculateLoan = () => {
     const principal = loanAmount - downPayment;
@@ -56,7 +122,7 @@ const VehicleDetailsPage = () => {
     }
   };
 
-  // Handle new review submission
+  
   // Handle new review submission
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -76,6 +142,126 @@ const VehicleDetailsPage = () => {
       setError('Failed to submit review');
     }
   };
+// Add to Cart functionality
+const handleAddToCart = async () => {
+  try {
+    setAddingToCart(true);
+    
+    // Get user ID if logged in
+    const userId = localStorage.getItem('userId');
+    
+    // Get active order ID from localStorage if exists
+    let activeOrderId = localStorage.getItem('activeOrderId');
+    let response;
+    
+    if (activeOrderId) {
+      // Add to existing order
+      response = await ApiService.addItemToOrder(
+        activeOrderId, 
+        vehicleId, 
+        1 // Quantity
+      );
+    } else {
+      // Create new order
+      const orderData = {
+        itemId: vehicleId,
+        quantity: 1
+      };
+      
+      response = await ApiService.createOrder(userId, orderData);
+      
+      // Save the new order ID
+      if (response && response.id) {
+        localStorage.setItem('activeOrderId', response.id);
+        activeOrderId = response.id;
+      }
+    }
+    
+    // Handle guest cart in localStorage
+    if (!userId) {
+      const existingCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
+      
+      const newItem = {
+        id: vehicleId,
+        itemId: vehicleId,
+        model: vehicle.model,
+        name: vehicle.name || vehicle.model,
+        brand: vehicle.brand,
+        price: vehicle.price,
+        imageUrl: vehicle.imageUrl,
+        quantity: 1
+      };
+      
+      // Check if item already exists in cart
+      const existingItemIndex = existingCart.findIndex(item => item.id === vehicleId);
+      
+      if (existingItemIndex >= 0) {
+        // Update quantity if already in cart
+        existingCart[existingItemIndex].quantity += 1;
+      } else {
+        // Add new item
+        existingCart.push(newItem);
+      }
+      
+      localStorage.setItem('guestCart', JSON.stringify(existingCart));
+    }
+    
+    // Track the cart event
+    if (ipAddress && vehicleId) {
+      ApiService.trackVisit(ipAddress, vehicleId, 'CART');
+    }
+    
+    // Show success message
+    alert("Vehicle added to cart successfully!");
+    setIsInCart(true);
+    await fetchCartItems();
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    alert("Failed to add vehicle to cart. Please try again.");
+  } finally {
+    setAddingToCart(false);
+  }
+};
+
+// Remove from Cart functionality
+const handleRemoveFromCart = async () => {
+  try {
+    setAddingToCart(true);
+    
+    const userId = localStorage.getItem('userId');
+    const activeOrderId = localStorage.getItem('activeOrderId');
+    
+    if (activeOrderId) {
+      // Find the orderItemId from the cart items
+      const itemInCart = cartItems.find(item => 
+        item.id === vehicleId || item.itemId === vehicleId || item.vid === vehicleId
+      );
+      
+      if (itemInCart) {
+        // Use the order item ID for removal
+        const orderItemId = itemInCart.orderItemId || itemInCart.id;
+        await ApiService.removeItemFromOrder(activeOrderId, orderItemId);
+      }
+    }
+    
+    // Update guest cart in localStorage if needed
+    if (!userId) {
+      let guestCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
+      guestCart = guestCart.filter(item => item.id !== vehicleId);
+      localStorage.setItem('guestCart', JSON.stringify(guestCart));
+    }
+    
+    // Show success message
+    alert("Vehicle removed from cart successfully!");
+    setIsInCart(false);
+    await fetchCartItems();
+  } catch (error) {
+    console.error("Error removing from cart:", error);
+    alert("Failed to remove vehicle from cart. Please try again.");
+  } finally {
+    setAddingToCart(false);
+  }
+};
 
 
   // Show error message if API failed
@@ -95,6 +281,30 @@ const VehicleDetailsPage = () => {
       <p><strong>Shape:</strong> {vehicle.shape}</p>
       <p><strong>Vehicle History:</strong> {vehicle.vehicleHistory}</p>
       <p><strong>Price:</strong> ${vehicle.price.toLocaleString()}</p> {/* Price formatted as currency */}
+       
+
+       {/* Cart Action Buttons */}
+      <div className="cart-actions">
+        {isInCart ? (
+          <button
+            className="remove-from-cart-button"
+            onClick={handleRemoveFromCart}
+            disabled={addingToCart}
+            style={{ backgroundColor: '#e74c3c', color: 'white', padding: '10px 15px', margin: '10px 0', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            {addingToCart ? "Removing..." : "Remove from Cart"}
+          </button>
+        ) : (
+          <button
+            className="add-to-cart-button"
+            onClick={handleAddToCart}
+            disabled={addingToCart}
+            style={{ backgroundColor: '#2ecc71', color: 'white', padding: '10px 15px', margin: '10px 0', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            {addingToCart ? "Adding..." : "Add to Cart"}
+          </button>
+        )}
+      </div>
 
       {/* Loan Calculator Section */}
       <div>

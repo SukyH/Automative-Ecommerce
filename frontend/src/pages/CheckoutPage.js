@@ -16,7 +16,11 @@ const CheckoutPage = () => {
         setErrorMessage('Credit Card Authorization Failed');
       } else {
         setErrorMessage('Order Successfully Completed');
-        history.push('/order-success'); // Redirect to order success page
+        cartItems.forEach(item => {
+          if (ipAddress && item.id) {
+            ApiService.trackVisit(ipAddress, item.id, 'PURCHASE');
+          }
+        });    
       }
   
       // Increment the payment attempts

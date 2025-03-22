@@ -370,6 +370,40 @@ static async getItemsByBrand(brand) {
     return response.data;
 }
 
+// 🛒 Add item to order  
+static async addItemToOrder(orderId, itemId, quantity) {
+    try {
+      const response = await axios.post(
+        `${this.BASE_URL}/orders/${orderId}/add-item/${itemId}`,
+        null,
+        {
+          params: { quantity },
+          headers: this.getHeader(),
+        }
+      );
+      return response.data;
+    } catch (err) {
+      console.error('Error adding item to order:', err);
+      throw err;
+    }
+  }
+  
+  // 🗑️ Remove item from order  
+  static async removeItemFromOrder(orderId, orderItemId) {
+    try {
+      const response = await axios.delete(
+        `${this.BASE_URL}/orders/${orderId}/remove-item/${orderItemId}`,
+        {
+          headers: this.getHeader(),
+        }
+      );
+      return response.data;
+    } catch (err) {
+      console.error('Error removing item from order:', err);
+      throw err;
+    }
+  }
+  
    // Add the getAllItemsInOrder method
 static async getAllItemsInOrder(orderId) {
     try {
