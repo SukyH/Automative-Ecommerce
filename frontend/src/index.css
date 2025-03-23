@@ -385,6 +385,7 @@ input, select {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  
 }
 
 .cart-items {
@@ -518,21 +519,12 @@ input, select {
   border-radius: 4px;
 }
 
-/* Media query for desktop */
-@media (min-width: 768px) {
-  .cart-content {
-    flex-direction: row;
-  }
-  
-  .cart-items {
-    flex: 3;
-  }
-  
-  .cart-summary {
-    flex: 1;
-    align-self: flex-start;
-    position: sticky;
-    top: 20px;
-  }
+
+
+iframe {
+  transition: transform 0.3s ease-in-out;
 }
 
+iframe:hover {
+  transform: scale(1.05);
+}

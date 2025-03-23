@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Navigation from './component/Navigation';
 import Footer from './component/Footer';
 import Protector from './service/Protector';
+import Chatbot from "./service/ChatbotService";
 
 // Pages
 import CatalogPage from './pages/CatalogPage';
@@ -78,13 +79,19 @@ function App() {
               />
             }
           />
-
+     
           {/* Catch-all Route for 404 */}
           <Route path="*" element={<h1>404 Not Found</h1>} />
         </Routes>
       </div>
+      <div className="App">
+      <h1>Welcome to Our EV Store!</h1>
+      <Chatbot />
+    </div>
+      
       <Footer />
     </Router>
+        
   );
 }
 
