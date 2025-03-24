@@ -71,9 +71,7 @@ const Navigation = () => {
           <Link to="/wishlist" className="nav-link">
             <i className="fas fa-heart"></i> Wishlist
           </Link>
-          <Link to="/checkout" className="nav-link">
-            <i className="fas fa-credit-card"></i> Checkout
-          </Link>
+    
 
           {/* Shopping Cart Button */}
           <Link to="/cart" className="nav-link">

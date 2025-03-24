@@ -58,14 +58,27 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDto createOrder(Long userId) {
+        //Check if a processed order already exists and status is processed
+        List<Order> existingOrders = orderRepository.findByUserId(userId);
+        for (Order existingOrder : existingOrders) {
+            if (existingOrder.getStatus() == OrderStatus.PROCESSED) {
+                return orderMapper.orderToOrderDto(existingOrder); 
+            }
+        }
+
+        // Otherwise create new order
         User user = new User();
-        user.setId(userId); 
-        Order order = new Order();
-        order.setUser(user); 
-        order.setCreatedAt(LocalDateTime.now());
-        Order savedOrder = orderRepository.save(order);
+        user.setId(userId);
+
+        Order newOrder = new Order();
+        newOrder.setUser(user);
+        newOrder.setCreatedAt(LocalDateTime.now());
+
+
+        Order savedOrder = orderRepository.save(newOrder);
         return orderMapper.orderToOrderDto(savedOrder);
     }
+
 
     @Override
     @Transactional

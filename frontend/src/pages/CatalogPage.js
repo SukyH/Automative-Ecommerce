@@ -179,16 +179,16 @@ const handleAddToCart = async (vehicle, isDeal = false) => {
     setAddingToCart(prev => ({ ...prev, [vehicleId]: true }));
 
     const userId = localStorage.getItem('userId');
-    console.log("📦 Adding to cart - User ID:", userId);
+    console.log("Adding to cart - User ID:", userId);
 
-    // ✅ Always create a new order
+  
     const createdOrder = await ApiService.createOrder(userId);
     if (!createdOrder || !createdOrder.orderID) {
-      throw new Error("🚨 Order creation failed.");
+      throw new Error("Order creation failed.");
     }
 
     const orderId = createdOrder.orderID.toString();
-    console.log("✅ New order created. Order ID:", orderId);
+    console.log("New order created. Order ID:", orderId);
 
     const quantityInput = prompt("Enter quantity to add:");
     const quantity = parseInt(quantityInput);
@@ -210,10 +210,10 @@ const handleAddToCart = async (vehicle, isDeal = false) => {
       ApiService.trackVisit(ipAddress, vehicleId, 'CART');
     }
 
-    alert("Item successfully added to cart ✅");
+    alert("Item successfully added to cart");
 
   } catch (error) {
-    console.error("❌ Error adding to cart:", error);
+    console.error("Error adding to cart:", error);
     alert("Failed to add vehicle to cart. Please try again.");
   } finally {
     const vehicleId = isDeal ? vehicle.item?.id : vehicle.id || vehicle.itemId || vehicle.vid;
@@ -338,11 +338,16 @@ const handleAddToCart = async (vehicle, isDeal = false) => {
               <div key={deal.id} className="vehicle-card hot-deal-card">
                 <img src={deal.item?.imageUrl} alt={deal.item?.model || 'Vehicle'} />
                 <h3>{deal.item?.model}</h3>
-                <p className="original-price">${deal.item?.price}</p>
-                <p className="discounted-price">
-                  ${deal.item?.price - deal.item?.price * (deal.discount / 100)}
-                </p>
-                <span className="deal-tag">🔥 {deal.discount}% OFF!</span>
+				<p className="original-price">
+				  ${deal.item?.price?.toFixed(2)}
+				</p>
+				<p className="discounted-price">
+				  ${(
+				    deal.item?.price -
+				    deal.item?.price * (parseFloat(deal.discountPercentage) / 100)
+				  ).toFixed(2)}
+				</p>
+				<span className="deal-tag">🔥 {parseFloat(deal.discountPercentage)}% OFF!</span>
                 <div className="button-group">
                   <button
                     className="view-details-button"

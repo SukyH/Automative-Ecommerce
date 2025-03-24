@@ -23,5 +23,7 @@ public class OrderDto {
     private Long userId;
     private LocalDateTime createdAt;
     private Set<OrderItem> orderItems;
+    private String status;
+
 
 }

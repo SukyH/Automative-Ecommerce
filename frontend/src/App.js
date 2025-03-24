@@ -32,7 +32,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/catalog" element={<CatalogPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
+		  <Route path="/checkout/:orderId" element={<CheckoutPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/register" element={<RegistrationPage />} />

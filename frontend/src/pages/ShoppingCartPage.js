@@ -16,73 +16,45 @@ const ShoppingCartPage = () => {
   useEffect(() => {
 	const loadOrdersAndCart = async () => {
 	  const userId = localStorage.getItem("userId");
-	  const allOrders = await ApiService.getAllOrders(userId);
-	  setOrders(allOrders);
-
-	  const allItems = [];
-
-	  for (const order of allOrders) {
-	    try {
-	      const items = await ApiService.getDetailedItemsInOrder(order.orderID);
-	      allItems.push(...items);
-	    } catch (err) {
-	      console.error(`Failed to fetch items for order ${order.orderID}:`, err);
-	    }
+	  if (!userId) {
+	    setError("User is not logged in.");
+	    setLoading(false);
+	    return;
 	  }
 
-	  setCartItems(allItems);
-	  setLoading(false);
+	  try {
+	    const allOrders = await ApiService.getAllOrders(userId);
+	    setOrders(allOrders);
+
+	    const allItems = [];
+	    for (const order of allOrders) {
+	      try {
+	        const items = await ApiService.getDetailedItemsInOrder(order.orderID);
+	        allItems.push(...items);
+	      } catch (err) {
+	        console.error(`Failed to fetch items for order ${order.orderID}:`, err);
+	      }
+	    }
+
+	    setCartItems(allItems);
+	    setLoading(false);
+	  } catch (err) {
+	    if (err.response && err.response.status === 403) {
+	      setError("User is not logged in.");
+	    } else {
+	      setError("Failed to load orders. Please try again.");
+	    }
+	    setCartItems([]);
+	    setOrders([]);
+	    setLoading(false);
+	  }
 	};
+
 
 
     loadOrdersAndCart();
   }, [orderId]);
 
-
-  const fetchAllOrders = async () => {
-    const userId = localStorage.getItem("userId");
-    const token = localStorage.getItem("token");
-    if (!userId || !token) return;
-
-    try {
-      const orderList = await ApiService.getAllOrders(userId);
-      setOrders(orderList);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    }
-  };
-
-  const fetchCartItems = async (targetOrderId) => {
-    try {
-      setLoading(true);
-      console.log("📦 Fetching cart items for order:", targetOrderId);
-
-      if (targetOrderId === 'guest') {
-        const guestCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
-        setCartItems(guestCart);
-      } else {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          console.error("🚫 No token found in localStorage!");
-          throw new Error('Missing token');
-        }
-
-        // ✅ Use the new backend endpoint to get full item info with quantity
-        const detailedItems = await ApiService.getDetailedItemsInOrder(targetOrderId);
-        console.log("✅ Detailed items:", detailedItems);
-
-        setCartItems(Array.isArray(detailedItems) ? detailedItems : []);
-      }
-
-      setError(null);
-    } catch (error) {
-      console.error('❌ Error fetching items in order:', error);
-      setError('Failed to load cart items. Please try again.');
-      setCartItems([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleUpdateQuantity = async (item, newQuantity) => {
     if (newQuantity < 1) return;
@@ -182,12 +154,20 @@ const orderIdOfItem = item.orderID || orderId;
       if (orderId === 'guest') {
         navigate('/checkout/guest');
       } else {
-        navigate(`/checkout/${orderId}`);
+		console.log("All orders for user:", orders);
+
+        const processedOrder = orders.find(order => order.status === 'PROCESSED');
+        if (processedOrder) {
+          navigate(`/checkout/${processedOrder.orderID}`);
+        } else {
+          alert('No active order found to checkout.');
+        }
       }
     } else {
       alert('Your cart is empty!');
     }
   };
+
 
   const handleContinueShopping = () => {
     navigate('/catalog');
@@ -197,18 +177,7 @@ const orderIdOfItem = item.orderID || orderId;
     <div className="shopping-cart-container">
       <h1>Your Shopping Cart</h1>
 
-      <div style={{ marginBottom: '2rem' }}>
-        <h2>📦 Order History</h2>
-        {orders.length === 0 ? (
-          <p>No previous orders.</p>
-        ) : (
-          <ul>
-            {orders.map(order => (
-              <li key={order.orderID}>Order #{order.orderID} - {order.status}</li>
-            ))}
-          </ul>
-        )}
-      </div>
+   
 
       {loading ? (
         <p>Loading your cart...</p>
