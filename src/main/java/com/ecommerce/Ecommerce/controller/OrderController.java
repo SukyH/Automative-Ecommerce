@@ -52,6 +52,22 @@ public class OrderController {
             @PathVariable Long orderItemId) {
         return ResponseEntity.ok(orderService.removeItemFromOrder(orderId, orderItemId));
     }
+    
+    @PutMapping("/{orderId}/update-quantity/{orderItemId}")
+    public ResponseEntity<String> updateItemQuantity(
+            @PathVariable Long orderId,
+            @PathVariable Long orderItemId,
+            @RequestParam int quantity) {
+        try {
+            orderService.updateOrderItemQuantity(orderId, orderItemId, quantity);
+            return ResponseEntity.ok("Quantity updated successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("An error occurred while updating quantity.");
+        }
+    }
+
   
     @PutMapping("/update-status/{orderId}")
     public ResponseEntity<OrderDto> updateOrderStatus(
@@ -72,6 +88,22 @@ public class OrderController {
         
         
     }
+    
+    @GetMapping("/{orderId}/detailed-items")
+    public ResponseEntity<List<Map<String, Object>>> getDetailedItemsInOrder(@PathVariable Long orderId) {
+        try {
+            List<Map<String, Object>> detailedItems = orderService.getDetailedItemsInOrder(orderId);
+            if (detailedItems.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(detailedItems);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    
+    
     
     @GetMapping("/report/monthly-orders")
     public ResponseEntity<List<Map<String, Object>>> getMonthlyOrderReport() {

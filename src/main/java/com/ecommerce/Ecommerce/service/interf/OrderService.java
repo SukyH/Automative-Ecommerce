@@ -17,7 +17,8 @@ public interface OrderService {
     OrderDto updateOrderStatus(Long orderItemId, String status);
 	List<Item> getAllItemsInOrder(Long orderId);
 	public List<Map<String, Object>> generateMonthlyOrderReport();
-	
+	List<Map<String, Object>> getDetailedItemsInOrder(Long orderId);
+	void updateOrderItemQuantity(Long orderId, Long orderItemId, int quantity);
 
 
 }

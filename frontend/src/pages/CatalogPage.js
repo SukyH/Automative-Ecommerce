@@ -158,6 +158,7 @@ const handleAddToWishlist = async (vehicleId) => {
       return;
     }
 
+
     await ApiService.addToWishlist(userId, vehicleId);
     alert("Added to wishlist!");
   } catch (error) {
@@ -172,29 +173,23 @@ const isItemInCart = (itemId) => {
     (item.id === itemId) || (item.itemId === itemId) || (item.vid === itemId)
   );
 };
-
 const handleAddToCart = async (vehicle, isDeal = false) => {
   try {
-    // Step 1: Determine the vehicle/item ID
     const vehicleId = isDeal ? vehicle.item?.id : vehicle.id || vehicle.itemId || vehicle.vid;
     setAddingToCart(prev => ({ ...prev, [vehicleId]: true }));
 
     const userId = localStorage.getItem('userId');
+    console.log("📦 Adding to cart - User ID:", userId);
 
-    // Step 2: Create order if not already created and save the orderId
-    let orderId = localStorage.getItem('activeOrderId');
-    if (!orderId || orderId === "undefined" || orderId === "null") {
-      const createdOrder = await ApiService.createOrder(userId);		
-	  if (!createdOrder || !createdOrder.orderID)
- {
-        throw new Error("Order creation failed.");
-      }
-      orderId = createdOrder.orderID.toString();
-      localStorage.setItem('activeOrderId', orderId);
-      console.log("Order created:", orderId);
+    // ✅ Always create a new order
+    const createdOrder = await ApiService.createOrder(userId);
+    if (!createdOrder || !createdOrder.orderID) {
+      throw new Error("🚨 Order creation failed.");
     }
 
-    // Step 3: Prompt for quantity after order is confirmed
+    const orderId = createdOrder.orderID.toString();
+    console.log("✅ New order created. Order ID:", orderId);
+
     const quantityInput = prompt("Enter quantity to add:");
     const quantity = parseInt(quantityInput);
 
@@ -203,17 +198,22 @@ const handleAddToCart = async (vehicle, isDeal = false) => {
       return;
     }
 
-    // Step 4: Add vehicle to order
-    console.log("Adding to order:", { orderId, vehicleId, quantity });
-    await ApiService.addItemToOrder(orderId, vehicleId, quantity);
+    console.log("🛒 Adding item to order:", {
+      orderId,
+      vehicleId,
+      quantity
+    });
 
+    await ApiService.addItemToOrder(orderId, vehicleId, quantity);
 
     if (ipAddress && vehicleId) {
       ApiService.trackVisit(ipAddress, vehicleId, 'CART');
     }
 
+    alert("Item successfully added to cart ✅");
+
   } catch (error) {
-    console.error("Error adding to cart:", error);
+    console.error("❌ Error adding to cart:", error);
     alert("Failed to add vehicle to cart. Please try again.");
   } finally {
     const vehicleId = isDeal ? vehicle.item?.id : vehicle.id || vehicle.itemId || vehicle.vid;

@@ -362,25 +362,13 @@ static async getItemsByBrand(brand) {
    }
    
    static async addItemToOrder(orderId, itemId, quantity) {
-     try {
-       const response = await axios.post(
-         `${this.BASE_URL}/orders/${orderId}/add-item/${itemId}`,
-         null,
-         {
-           params: { quantity },
-           headers: this.getHeader(),
-         }
-       );
-       return response.data;
-     } catch (error) {
-		console.error("❌ Error calling addItemToOrder API:", {
-		  error: error.response?.data,
-		  status: error.response?.status,
-		  url: `${this.BASE_URL}/orders/${orderId}/add-item/${itemId}?quantity=${quantity}`,
-		});
-       throw error;
-     }
+     return axios.post(
+       `${this.BASE_URL}/orders/${orderId}/add-item/${itemId}?quantity=${quantity}`,
+       null, // no body
+       { headers: this.getHeader() }
+     );
    }
+
 
   
   // 🗑️ Remove item from order  
@@ -419,6 +407,35 @@ static async getAllItemsInOrder(orderId) {
     });
     return response.data;
 }
+
+
+static async getDetailedItemsInOrder(orderId) {
+  try {
+    const response = await axios.get(`${this.BASE_URL}/orders/${orderId}/detailed-items`, {
+      headers: this.getHeader()
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching detailed items in order:', error);
+    throw error;
+  }
+}
+
+static async updateOrderItemQuantity(orderId, orderItemId, quantity) {
+  try {
+    const response = await axios.put(
+      `${this.BASE_URL}/orders/${orderId}/update-quantity/${orderItemId}?quantity=${quantity}`,
+      null,
+      { headers: this.getHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating order item quantity:", error);
+    throw error;
+  }
+}
+
+
 
 // Method to update order status
 static async updateOrderStatus(orderId, status) {

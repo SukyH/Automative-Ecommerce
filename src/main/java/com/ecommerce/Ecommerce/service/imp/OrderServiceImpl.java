@@ -24,8 +24,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -167,6 +166,51 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return new ArrayList<>(reportMap.values());
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getDetailedItemsInOrder(Long orderId) {
+        List<OrderItem> orderItems = orderItemRepository.findByOrderOrderID(orderId);
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (OrderItem orderItem : orderItems) {
+            Map<String, Object> itemMap = new HashMap<>();
+            itemMap.put("orderItemId", orderItem.getOrderItemid());
+            itemMap.put("quantity", orderItem.getQuantity());
+            itemMap.put("orderID", orderItem.getOrder().getOrderID());
+
+            Item item = orderItem.getItem();
+            itemMap.put("vid", item.getVid());
+            itemMap.put("name", item.getName());
+            itemMap.put("brand", item.getBrand());
+            itemMap.put("price", item.getPrice());
+            itemMap.put("model", item.getModel());
+            itemMap.put("imageUrl", item.getImageUrl());
+            itemMap.put("orderID", orderItem.getOrder().getOrderID()); 
+
+            result.add(itemMap);
+        }
+
+        return result;
+    }
+
+
+    @Override
+    public void updateOrderItemQuantity(Long orderId, Long orderItemId, int quantity) {
+        Optional<OrderItem> optional = orderItemRepository.findById(orderItemId);
+        if (optional.isEmpty()) {
+            throw new IllegalArgumentException("Order item not found.");
+        }
+
+        OrderItem orderItem = optional.get();
+
+        if (!orderItem.getOrder().getOrderID().equals(orderId)) {
+            throw new IllegalArgumentException("Order ID does not match this order item.");
+        }
+
+        orderItem.setQuantity(quantity);
+        orderItemRepository.save(orderItem);
     }
 
 
