@@ -26,5 +26,5 @@ import java.util.Optional;
 public interface WishlistService {
     void addToWishlist(Long userId, Long productId);
     List<Wishlist> getWishlist(Long userId);
-    void removeFromWishlist(Long userId, Long productId);
+    public void removeFromWishlist(Long wishlistId);
 }

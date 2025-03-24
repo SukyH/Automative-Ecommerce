@@ -40,17 +40,18 @@ public class WishlistServiceImpl implements WishlistService {
         return wishlistRepository.findByUserId(userId);
     }
 
-    // Remove a specific item from wishlist
+  
     @Override
     @Transactional
-    public void removeFromWishlist(Long userId, Long productId) {
-        // Use direct repo method for cleaner code
-        if (wishlistRepository.findByUserIdAndProductId(userId, productId).isPresent()) {
-            wishlistRepository.deleteByUserIdAndProductId(userId, productId);
+    public void removeFromWishlist(Long wishlistId) {
+        if (wishlistRepository.existsById(wishlistId)) {
+            wishlistRepository.deleteById(wishlistId);
         } else {
-            throw new RuntimeException("Product not found in wishlist");
+            throw new RuntimeException("Wishlist item not found");
         }
     }
+
+
 }
 
 

@@ -46,17 +46,18 @@ export default class ApiService {
 
    // Wishlist APIs
    static async addToWishlist(userId, itemId) {
-    try {
-        const response = await axios.post(`${this.BASE_URL}/wishlist/add`, null, {
-            params: { userId, itemId },
-            headers: this.getHeader(),
-        });
-        return response.data;
-    } catch (err) {
-        console.error("Error adding product to wishlist:", err);
-        throw err;
-    }
-}
+     const payload = {
+       userId: parseInt(userId),
+       productId: parseInt(itemId),
+     };
+
+     const response = await axios.post(`${this.BASE_URL}/wishlist/add`, payload, {
+       headers: this.getHeader(),
+     });
+
+     return response.data;
+   }
+
 
    static async getWishlist(userId) {
        try {
@@ -70,17 +71,10 @@ export default class ApiService {
        }
    }
 
-
-   static async removeFromWishlist(itemId) {
-       try {
-           const response = await axios.delete(`${this.BASE_URL}/wishlist/${itemId}`, {
-               headers: this.getHeader(),
-           });
-           return response.data;
-       } catch (err) {
-           console.error("Error removing vehicle from wishlist:", err);
-           throw err;
-       }
+   static async removeFromWishlist(wishlistId) {
+     return axios.delete(`${this.BASE_URL}/wishlist/remove/${wishlistId}`, {
+       headers: this.getHeader()
+     });
    }
 
 
@@ -362,31 +356,32 @@ static async getItemsByBrand(brand) {
 
 
    /* Orders API */
-   static async createOrder(userId, body) {
-    const url = userId ? `${this.BASE_URL}/orders/create/${userId}` : `${this.BASE_URL}/orders/create`;
-    const response = await axios.post(url, body, {
-        headers: this.getHeader()
-    });
-    return response.data;
-}
+   static async createOrder(userId) {
+     const response = await axios.post(`${this.BASE_URL}/orders/create/${userId}`);
+     return response.data;
+   }
+   
+   static async addItemToOrder(orderId, itemId, quantity) {
+     try {
+       const response = await axios.post(
+         `${this.BASE_URL}/orders/${orderId}/add-item/${itemId}`,
+         null,
+         {
+           params: { quantity },
+           headers: this.getHeader(),
+         }
+       );
+       return response.data;
+     } catch (error) {
+		console.error("❌ Error calling addItemToOrder API:", {
+		  error: error.response?.data,
+		  status: error.response?.status,
+		  url: `${this.BASE_URL}/orders/${orderId}/add-item/${itemId}?quantity=${quantity}`,
+		});
+       throw error;
+     }
+   }
 
-// 🛒 Add item to order  
-static async addItemToOrder(orderId, itemId, quantity) {
-    try {
-      const response = await axios.post(
-        `${this.BASE_URL}/orders/${orderId}/add-item/${itemId}`,
-        null,
-        {
-          params: { quantity },
-          headers: this.getHeader(),
-        }
-      );
-      return response.data;
-    } catch (err) {
-      console.error('Error adding item to order:', err);
-      throw err;
-    }
-  }
   
   // 🗑️ Remove item from order  
   static async removeItemFromOrder(orderId, orderItemId) {

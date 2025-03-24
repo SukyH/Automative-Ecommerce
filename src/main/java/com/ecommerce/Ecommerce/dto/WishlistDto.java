@@ -29,6 +29,8 @@ public class WishlistDto {
     private Long userId;
     private Long productId;
     private LocalDate addedDate;
+    
+    
 
 	
 	private LocalDateTime createdAt;// not sure if we want to keep track

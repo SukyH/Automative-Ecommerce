@@ -18,6 +18,8 @@ const CatalogPage = () => {
   const [addingToCart, setAddingToCart] = useState({});
   const navigate = useNavigate();
   const [ipAddress, setIpAddress] = useState('');
+  const [cartItems, setCartItems] = useState([]);
+
   // Fetch vehicles and hot deals on load
   useEffect(() => {
     const fetchVehiclesAndDeals = async () => {
@@ -148,97 +150,76 @@ const fetchCartItems = async () => {
   }
 };
 
+const handleAddToWishlist = async (vehicleId) => {
+  try {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      alert("Please log in to use the wishlist feature.");
+      return;
+    }
+
+    await ApiService.addToWishlist(userId, vehicleId);
+    alert("Added to wishlist!");
+  } catch (error) {
+    console.error("Error adding to wishlist:", error);
+    alert("Failed to add to wishlist. Please try again.");
+  }
+};
+
 // Check if item is in cart
 const isItemInCart = (itemId) => {
   return cartItems.some(item => 
     (item.id === itemId) || (item.itemId === itemId) || (item.vid === itemId)
   );
 };
-  // Add to Cart functionality - fixed to properly use the API
-  const handleAddToCart = async (vehicle, isDeal = false) => {
-    try {
-      const vehicleId = isDeal ? vehicle.item?.id : vehicle.vid;
-      setAddingToCart({ ...addingToCart, [vehicleId]: true });
-      
-      // Get user ID if logged in
-      const userId = localStorage.getItem('userId');
-      
-      // Get active order ID from localStorage if exists
-      let activeOrderId = localStorage.getItem('activeOrderId');
-      let response;
-      
-      if (activeOrderId) {
-        // Add to existing order using the correct API method
-        response = await ApiService.addItemToOrder(
-          activeOrderId, 
-          vehicleId, 
-          1 // Quantity
-        );
-      } else {
-        // Create new order
-        const orderData = {
-          itemId: vehicleId,
-          quantity: 1
-        };
-        
-        response = await ApiService.createOrder(userId, orderData);
-        
-        // Save the new order ID
-        if (response && response.id) {
-          localStorage.setItem('activeOrderId', response.id);
-          activeOrderId = response.id;
-        }
+
+const handleAddToCart = async (vehicle, isDeal = false) => {
+  try {
+    // Step 1: Determine the vehicle/item ID
+    const vehicleId = isDeal ? vehicle.item?.id : vehicle.id || vehicle.itemId || vehicle.vid;
+    setAddingToCart(prev => ({ ...prev, [vehicleId]: true }));
+
+    const userId = localStorage.getItem('userId');
+
+    // Step 2: Create order if not already created and save the orderId
+    let orderId = localStorage.getItem('activeOrderId');
+    if (!orderId || orderId === "undefined" || orderId === "null") {
+      const createdOrder = await ApiService.createOrder(userId);		
+	  if (!createdOrder || !createdOrder.orderID)
+ {
+        throw new Error("Order creation failed.");
       }
-      
-      // Handle guest cart in localStorage
-      if (!userId) {
-        const existingCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
-        const price = isDeal 
-          ? vehicle.item?.price - (vehicle.item?.price * (vehicle.discount / 100))
-          : vehicle.price;
-        
-        const newItem = {
-          id: vehicleId,
-          itemId: vehicleId,
-          model: isDeal ? vehicle.item?.model : vehicle.model,
-          name: isDeal ? vehicle.item?.model : vehicle.model,
-          brand: isDeal ? vehicle.item?.brand : vehicle.brand,
-          price: price,
-          imageUrl: isDeal ? vehicle.item?.imageUrl : vehicle.imageUrl,
-          quantity: 1
-        };
-        
-        // Check if item already exists in cart
-        const existingItemIndex = existingCart.findIndex(item => item.id === vehicleId);
-        
-        if (existingItemIndex >= 0) {
-          // Update quantity if already in cart
-          existingCart[existingItemIndex].quantity += 1;
-        } else {
-          // Add new item
-          existingCart.push(newItem);
-        }
-        
-        localStorage.setItem('guestCart', JSON.stringify(existingCart));
-      }
-      
-      // Refresh cart items
-      await fetchCartItems();
-      
-      // Show success message
-      alert("Vehicle added to cart successfully!");
-      // Track the cart event
-    if (ipAddress && productId) {
-      ApiService.trackVisit(ipAddress, productId, 'CART');
+      orderId = createdOrder.orderID.toString();
+      localStorage.setItem('activeOrderId', orderId);
+      console.log("Order created:", orderId);
     }
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      alert("Failed to add vehicle to cart. Please try again.");
-    } finally {
-      const vehicleId = isDeal ? vehicle.item?.id : vehicle.vid;
-      setAddingToCart({ ...addingToCart, [vehicleId]: false });
+
+    // Step 3: Prompt for quantity after order is confirmed
+    const quantityInput = prompt("Enter quantity to add:");
+    const quantity = parseInt(quantityInput);
+
+    if (!quantityInput || isNaN(quantity) || quantity <= 0) {
+      alert("Please enter a valid quantity.");
+      return;
     }
-  };
+
+    // Step 4: Add vehicle to order
+    console.log("Adding to order:", { orderId, vehicleId, quantity });
+    await ApiService.addItemToOrder(orderId, vehicleId, quantity);
+
+
+    if (ipAddress && vehicleId) {
+      ApiService.trackVisit(ipAddress, vehicleId, 'CART');
+    }
+
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    alert("Failed to add vehicle to cart. Please try again.");
+  } finally {
+    const vehicleId = isDeal ? vehicle.item?.id : vehicle.id || vehicle.itemId || vehicle.vid;
+    setAddingToCart(prev => ({ ...prev, [vehicleId]: false }));
+  }
+};
 
   // Remove from Cart functionality
   const handleRemoveFromCart = async (vehicle, isDeal = false) => {
@@ -369,6 +350,8 @@ const isItemInCart = (itemId) => {
                   >
                     View Details
                   </button>
+				  
+			
                   
                   {isItemInCart(deal.item?.id) ? (
                     <button
@@ -418,6 +401,13 @@ const isItemInCart = (itemId) => {
                 >
                   View Details
                 </button>
+				
+				<button
+				  className="wishlist-button"
+				  onClick={() => handleAddToWishlist(vehicle.vid)}
+				>
+				  🤍 Add to Wishlist
+				</button>
                 
                 {isItemInCart(vehicle.vid) ? (
                   <button

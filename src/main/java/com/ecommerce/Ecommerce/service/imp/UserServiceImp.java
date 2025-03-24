@@ -102,6 +102,7 @@ public class UserServiceImp implements UserService {
                 .token(token)
                 .expirationTime(expirationTime) // Return expiration time dynamically
                 .role(user.getRole().name())
+                .id(user.getId())
                 .build();
     }
 

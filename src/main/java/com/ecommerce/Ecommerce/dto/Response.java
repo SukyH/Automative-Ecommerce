@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
 public class Response {
@@ -23,6 +25,7 @@ public class Response {
 	private String token;
 	private String role;
 	private String expirationTime;
+	private Long id;
 	
 	private int AllPages;
 	private long AllElement;

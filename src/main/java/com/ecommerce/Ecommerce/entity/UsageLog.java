@@ -22,10 +22,13 @@ import lombok.Data;
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Long id;
 
+	    @Column(name = "ip_address")
 	    private String ipaddress;
 	    private String day;
 	    private String vid;
+	    @Column(name = "event_type")  
 	    private String eventtype;
 	}
+	
 
 

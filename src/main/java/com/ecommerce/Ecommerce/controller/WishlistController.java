@@ -46,11 +46,12 @@ public class WishlistController {
         return ResponseEntity.ok(wishlist);
     }
     
-    @DeleteMapping("/{productId}")
-    public ResponseEntity<String> removeFromWishlist(@PathVariable Long productId, @RequestParam Long userId) {
-        wishlistService.removeFromWishlist(userId, productId);
-        return ResponseEntity.ok("Product removed from wishlist");
+    @DeleteMapping("/remove/{wishlistId}")
+    public ResponseEntity<String> removeFromWishlist(@PathVariable Long wishlistId) {
+        wishlistService.removeFromWishlist(wishlistId);
+        return ResponseEntity.ok("Removed from wishlist");
     }
+
 
 }
     
