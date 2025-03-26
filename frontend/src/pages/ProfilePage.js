@@ -21,10 +21,11 @@ const ProfilePage = () => {
       try {
         const userData = await ApiService.getLoggedInUserInfo();
         setUser(userData);
-        setAddress(userData.address || {});  // Populate the address form if available
-        setLoading(false);
+        setAddress(userData.address || { street: '', city: '', province: '', zipCode: '', country: '' });
       } catch (err) {
+        console.error("Error fetching user data:", err);
         setError('Failed to load user information');
+      } finally {
         setLoading(false);
       }
     };
@@ -47,17 +48,16 @@ const ProfilePage = () => {
     try {
       const response = await ApiService.saveAddress(address);  // Call saveAddress API
       alert(response.message || 'Address saved successfully!');
-      setAddressLoading(false);
     } catch (err) {
+      console.error("Error saving address:", err);
       setAddressError('Failed to save address');
+    } finally {
       setAddressLoading(false);
     }
   };
 
   const handleLogout = () => {
-    // Clear the token and redirect to login
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');  // If using refresh token as well
+    ApiService.logout();  // Call logout API method
     window.location.href = '/login';  // Redirect to login page
   };
 
@@ -66,7 +66,7 @@ const ProfilePage = () => {
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return <div className="error-text">{error}</div>;
   }
 
   return (
@@ -74,8 +74,8 @@ const ProfilePage = () => {
       <h1>Profile</h1>
       {user ? (
         <>
-          <p>Name: {user.name}</p>
-          <p>Email: {user.email}</p>
+          <p><strong>Name:</strong> {user.name}</p>
+          <p><strong>Email:</strong> {user.email}</p>
 
           <h2>Address</h2>
           <form onSubmit={handleSaveAddress}>

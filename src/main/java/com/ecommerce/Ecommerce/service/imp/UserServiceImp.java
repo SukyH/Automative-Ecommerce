@@ -131,12 +131,16 @@ public class UserServiceImp implements UserService {
 
     @Override
     public Response getUserInfoAndOrderHistory() {
-        User user = getLoginUser();
-        UserDto userDto = entityMapper.mapUserToDtoPlusAddressAndOrderHistory(user);
+        User user = getLoginUser(); 
+        if (user == null) {
+            throw new RuntimeException("User not found or unauthorized");
+        }
 
+        UserDto userDto = entityMapper.mapUserToDtoPlusAddressAndOrderHistory(user);
         return Response.builder()
                 .status(200)
                 .user(userDto)
                 .build();
     }
+
 }

@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import ApiService from '../service/ApiService';
 
 const VehicleManagement = () => {
-  const [vehicles, setVehicles] = useState([]);
+  const [vehicles, setVehicles] = useState([]); // Initialize as an empty array
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // State for adding new vehicle
   const [newVehicle, setNewVehicle] = useState({
     name: '',
     description: '',
@@ -19,25 +18,32 @@ const VehicleManagement = () => {
     shape: '',
     modelYear: '',
     vehicleHistory: '',
-    categoryId: '', // assuming categoryId is needed
   });
 
-  // State for error messages
   const [addVehicleError, setAddVehicleError] = useState(null);
 
-  useEffect(() => {
-    const fetchVehicles = async () => {
-      try {
-        const response = await ApiService.getAllItems();
+  // Fetch vehicles from the API
+  const fetchVehicles = async () => {
+    try {
+      const response = await ApiService.getAllItems();
+  
+      // Check if response contains an array or a 'content' field
+      if (Array.isArray(response.data)) {
         setVehicles(response.data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching vehicles:', err);
-        setError('Failed to load vehicles.');
-        setLoading(false);
+      } else if (response.data && Array.isArray(response.data.content)) {
+        setVehicles(response.data.content);
+      } else {
+        setVehicles([]); // Ensure empty array if no data
       }
-    };
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching vehicles:', err);
+      setError('Failed to load vehicles.');
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchVehicles();
   }, []);
 
@@ -52,9 +58,7 @@ const VehicleManagement = () => {
       }
 
       await ApiService.updateItem(vehicleId, updatedVehicle);
-      setVehicles(vehicles.map(vehicle =>
-        vehicle.id === vehicleId ? { ...vehicle, ...updatedVehicle } : vehicle
-      ));
+      fetchVehicles(); // Re-fetch vehicles after successful update
       alert('Vehicle updated successfully');
     } catch (err) {
       console.error('Error updating vehicle:', err);
@@ -65,7 +69,7 @@ const VehicleManagement = () => {
   const handleDeleteVehicle = async (vehicleId) => {
     try {
       await ApiService.deleteItem(vehicleId);
-      setVehicles(vehicles.filter(vehicle => vehicle.id !== vehicleId));
+      fetchVehicles(); // Re-fetch vehicles after successful deletion
       alert('Vehicle deleted successfully');
     } catch (err) {
       console.error('Error deleting vehicle:', err);
@@ -93,14 +97,13 @@ const VehicleManagement = () => {
       formData.append('shape', newVehicle.shape);
       formData.append('modelYear', newVehicle.modelYear);
       formData.append('vehicleHistory', newVehicle.vehicleHistory);
-      formData.append('categoryId', newVehicle.categoryId);
 
       if (newVehicle.image) {
         formData.append('file', newVehicle.image);
       }
 
       const response = await ApiService.createItem(formData);
-      setVehicles([...vehicles, response.data]);
+      setVehicles((prevVehicles) => [...prevVehicles, response.data]); // Optimistically update the state
       setNewVehicle({
         name: '',
         description: '',
@@ -113,7 +116,6 @@ const VehicleManagement = () => {
         shape: '',
         modelYear: '',
         vehicleHistory: '',
-        categoryId: '',
       });
       setAddVehicleError(null);
       alert('Vehicle added successfully');
@@ -132,33 +134,32 @@ const VehicleManagement = () => {
     setNewVehicle({ ...newVehicle, [name]: value });
   };
 
- const handleAddHotDeal = async (vehicleId, discount) => {
-	try {
-  	const response = await ApiService.addHotDeal(vehicleId, discount);
-  	alert(`Hot Deal added with ${discount}% off!`);
-  	const updatedVehicles = vehicles.map(vehicle =>
-    	vehicle.id === vehicleId ? { ...vehicle, hotDeal: true, discount } : vehicle
-  	);
-  	setVehicles(updatedVehicles);
-	} catch (err) {
-  	console.error('Error adding hot deal:', err);
-  	alert('Failed to add hot deal');
-	}
+  const handleAddHotDeal = async (vehicleId, discount) => {
+    try {
+      const response = await ApiService.addHotDeal(vehicleId, discount);
+      alert(`Hot Deal added with ${discount}% off!`);
+      const updatedVehicles = vehicles.map(vehicle =>
+        vehicle.vid === vehicleId ? { ...vehicle, hotDeal: true, discount } : vehicle
+      );
+      setVehicles(updatedVehicles);
+    } catch (err) {
+      console.error('Error adding hot deal:', err);
+      alert('Failed to add hot deal');
+    }
   };
 
- 
   const handleRemoveHotDeal = async (hotDealId) => {
-	try {
-  	await ApiService.removeHotDeal(hotDealId);
-  	alert('Hot Deal removed!');
-  	const updatedVehicles = vehicles.map(vehicle =>
-    	vehicle.hotDealId === hotDealId ? { ...vehicle, hotDeal: false, discount: null } : vehicle
-  	);
-  	setVehicles(updatedVehicles);
-	} catch (err) {
-  	console.error('Error removing hot deal:', err);
-  	alert('Failed to remove hot deal');
-	}
+    try {
+      await ApiService.removeHotDeal(hotDealId);
+      alert('Hot Deal removed!');
+      const updatedVehicles = vehicles.map(vehicle =>
+        vehicle.hotDealId === hotDealId ? { ...vehicle, hotDeal: false, discount: null } : vehicle
+      );
+      setVehicles(updatedVehicles);
+    } catch (err) {
+      console.error('Error removing hot deal:', err);
+      alert('Failed to remove hot deal');
+    }
   };
 
   if (loading) return <p>Loading vehicles...</p>;
@@ -268,15 +269,6 @@ const VehicleManagement = () => {
           />
         </div>
         <div>
-          <label>Category ID:</label>
-          <input
-            type="text"
-            name="categoryId"
-            value={newVehicle.categoryId}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div>
           <label>Image:</label>
           <input type="file" onChange={handleImageChange} />
         </div>
@@ -296,29 +288,37 @@ const VehicleManagement = () => {
           </tr>
         </thead>
         <tbody>
-          {vehicles.map((vehicle) => (
-            <tr key={vehicle.vid}>
-              <td>{vehicle.name}</td>
-              <td>{vehicle.model}</td>
-              <td>${vehicle.price}</td>
-              <td>{vehicle.quantity}</td>
-              <td>
-              {vehicle.hotDeal ? (
-              	<span>🔥 {vehicle.discount}% Off!</span>
-            	) : (
-              	<button onClick={() => handleAddHotDeal(vehicle.id, 10)}>Add Hot Deal</button>
-            	)}
-          	</td>
-          	<td>
-                <button onClick={() => handleUpdateVehicle(vehicle.vid, { price: 12000, image: vehicle.imageUrl })}>
-                  Update
-                </button>
-                <button onClick={() => handleDeleteVehicle(vehicle.vid)}>
-                  Delete
-                </button>
-              </td>
+          {vehicles && vehicles.length > 0 ? (
+            vehicles.map((vehicle) => (
+              <tr key={vehicle.vid}>
+                <td>{vehicle.name}</td>
+                <td>{vehicle.model}</td>
+                <td>${vehicle.price}</td>
+                <td>{vehicle.quantity}</td>
+                <td>
+                  {vehicle.hotDeal ? (
+                    <span>🔥 {vehicle.discount}% Off!</span>
+                  ) : (
+                    <button onClick={() => handleAddHotDeal(vehicle.vid, 10)}>
+                      Add Hot Deal
+                    </button>
+                  )}
+                </td>
+                <td>
+                  <button onClick={() => handleUpdateVehicle(vehicle.vid, { price: 12000, image: vehicle.imageUrl })}>
+                    Update
+                  </button>
+                  <button onClick={() => handleDeleteVehicle(vehicle.vid)}>
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="5">No vehicles available</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>
