@@ -5,6 +5,7 @@ import com.ecommerce.Ecommerce.entity.Item;
 import com.ecommerce.Ecommerce.entity.Review;
 import com.ecommerce.Ecommerce.repository.ItemRepo;
 import com.ecommerce.Ecommerce.repository.ReviewRepository;
+import com.ecommerce.Ecommerce.service.AwsS3Service;
 import com.ecommerce.Ecommerce.service.interf.ItemService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -12,6 +13,7 @@ import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,35 +25,58 @@ import java.util.stream.Collectors;
 @Service
 public class ItemServiceImpl implements ItemService {
 
-	@Autowired
-	private ItemRepo itemRepo;
-	@Autowired
-	private   ReviewRepository reviewRepo;
+
+	    private final ItemRepo itemRepo;
+	    private final ReviewRepository reviewRepo;
+	    private final AwsS3Service awsS3Service;
+
+	    @Autowired
+	    public ItemServiceImpl(ItemRepo itemRepo, ReviewRepository reviewRepo, AwsS3Service awsS3Service) {
+	        this.itemRepo = itemRepo;
+	        this.reviewRepo = reviewRepo;
+	        this.awsS3Service = awsS3Service;
+	    }
+
+	    @Override
+	    public Item createItem(ItemDto itemDto, MultipartFile imageFile) {
+	        String imageUrl = null;
+
+	        try {
+	            // Upload image to S3 if present
+	            if (imageFile != null && !imageFile.isEmpty()) {
+	                imageUrl = awsS3Service.saveImageToS3(imageFile);
+	            }
+	        } catch (Exception e) {
+	            throw new RuntimeException("Failed to upload image to S3", e);
+	        }
+
+	        // Create item
+	        Item item = new Item();
+	        item.setName(itemDto.getName());
+	        item.setDescription(itemDto.getDescription());
+	        item.setBrand(itemDto.getBrand());
+	        item.setModel(itemDto.getModel());
+	        item.setPrice(itemDto.getPrice());
+	        item.setQuantity(itemDto.getQuantity());
+	        item.setMileage(itemDto.getMileage());
+	        item.setShape(itemDto.getShape());
+	        item.setModelYear(itemDto.getModelYear());
+	        item.setVehicleHistory(itemDto.getVehicleHistory());
+	        item.setInteriorColor(itemDto.getInteriorColor());
+	        item.setExteriorColor(itemDto.getExteriorColor());
+	        item.setFabric(itemDto.getFabric());
+
+	        if (imageUrl != null) {
+	            item.setImageUrl(imageUrl);
+	        }
+
+	        // Save to DB
+	        return itemRepo.save(item);
+	    }
+	
 
 
 
-	@Override
-	public Item createItem(ItemDto itemDto) {
-		// Logic to create item
-		Item item = new Item();
-		item.setName(itemDto.getName());
-		item.setDescription(itemDto.getDescription());
-		item.setBrand(itemDto.getBrand());
-		item.setModel(itemDto.getModel());
-		item.setImageUrl(itemDto.getImageUrl());
-		item.setPrice(itemDto.getPrice());
-		item.setQuantity(itemDto.getQuantity());
-		item.setMileage(itemDto.getMileage()); 
-		item.setShape(itemDto.getShape());
-		item.setModelYear(itemDto.getModelYear());
-		item.setVehicleHistory(itemDto.getVehicleHistory());
-		item.setInteriorColor(itemDto.getInteriorColor());
-		item.setExteriorColor(itemDto.getExteriorColor());
-		item.setFabric(itemDto.getFabric());
-
-		// Set other fields as needed, then save it to DB
-		return itemRepo.save(item);
-	}
 
 	@Override
 	public Item updateItem(ItemDto itemDto) {

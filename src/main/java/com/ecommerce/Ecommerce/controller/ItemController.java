@@ -9,10 +9,13 @@ import com.ecommerce.Ecommerce.repository.ItemRepo;
 import com.ecommerce.Ecommerce.service.interf.ItemService;
 import com.ecommerce.Ecommerce.service.AwsS3Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -33,28 +36,42 @@ public class ItemController {
         return ResponseEntity.ok(itemService.getAllItems(page, size));
     }
 
-    
+    @CrossOrigin(origins = "*")
     @PostMapping("/items/create")
-    public ItemDto createItem(@RequestBody ItemDto itemDto) {
-        Item item = itemService.createItem(itemDto); // Create item through service
+    public ResponseEntity<ItemDto> createItem(
+        @RequestParam("name") String name,
+        @RequestParam("description") String description,
+        @RequestParam("brand") String brand,
+        @RequestParam("model") String model,
+        @RequestParam("price") BigDecimal price,
+        @RequestParam("quantity") int quantity,
+        @RequestParam("mileage") int mileage,
+        @RequestParam("shape") String shape,
+        @RequestParam("modelYear") int modelYear,
+        @RequestParam("vehicleHistory") String vehicleHistory,
+        @RequestParam(value = "image", required = false) MultipartFile imageFile) {
 
-        return new ItemDto(
-                item.getVid(),
-                item.getName(),
-                item.getDescription(),
-                item.getBrand(),
-                item.getModel(),
-                item.getImageUrl(),
-                item.getPrice(),
-                item.getQuantity(),
-                item.getMileage(),
-                item.getShape(),
-                item.getModelYear(),
-                item.getVehicleHistory(), 
-                item.getInteriorColor(), 
-                item.getExteriorColor(), 
-                item.getFabric()     
-        );
+        ItemDto itemDto = new ItemDto(null, name, description, brand, model, null, price, quantity, mileage, shape, modelYear, vehicleHistory, null, null, null);
+        
+        Item item = itemService.createItem(itemDto, imageFile);
+
+        return ResponseEntity.ok(new ItemDto(
+            item.getVid(),
+            item.getName(),
+            item.getDescription(),
+            item.getBrand(),
+            item.getModel(),
+            item.getImageUrl(),
+            item.getPrice(),
+            item.getQuantity(),
+            item.getMileage(),
+            item.getShape(),
+            item.getModelYear(),
+            item.getVehicleHistory(),
+            item.getInteriorColor(),
+            item.getExteriorColor(),
+            item.getFabric()
+        ));
     }
 
      
@@ -133,12 +150,22 @@ public class ItemController {
    }
 
 
-    //Upload vehicle image to S3
-    @PostMapping("/items/upload")
-    public ResponseEntity<String> uploadVehicleImage(@RequestParam("file") MultipartFile file) {
-        String imageUrl = awsS3Service.saveImageToS3(file);
-        return ResponseEntity.ok(imageUrl);
-    }
+  @PostMapping("/items/upload")
+  public ResponseEntity<String> uploadVehicleImage(@RequestParam("file") MultipartFile file) {
+	  if (file.getSize() > 10 * 1024 * 1024) { // 10MB limit
+		    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+		                         .body("File size exceeds the limit of 10MB");
+		}
+
+	  try {
+	        String imageUrl = awsS3Service.saveImageToS3(file);
+	        return ResponseEntity.ok("File uploaded successfully. URL: " + imageUrl);
+	    } catch (RuntimeException e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                 .body("Failed to upload file: " + e.getMessage());
+	    }
+	}
+
     @GetMapping("/items/details/{itemId}")
     public ResponseEntity<ItemDto> getItemDetails(@PathVariable Long itemId) {
         return ResponseEntity.ok(itemService.getItemDetails(itemId));

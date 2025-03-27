@@ -212,7 +212,8 @@ static isAdmin() {
            headers: {
                ...this.getHeader(),
                "Content-Type": "multipart/form-data"
-           }
+           },
+           withCredentials: true,
        });
        return response.data;
    }
@@ -464,7 +465,7 @@ static async updateOrderStatus(orderId, status) {
 
    /* Vehicle Image Upload API */
    static async uploadVehicleImage(formData) {
-       const response = await axios.post(`${this.BASE_URL}/items/upload`, formData, {
+       const response = await axios.post(`${this.BASE_URL}/catalog/items/upload`, formData, {
            headers: {
                ...this.getHeader(),
                "Content-Type": "multipart/form-data",

@@ -25,6 +25,9 @@ const ProfilePage = () => {
       } catch (err) {
         console.error("Error fetching user data:", err);
         setError('Failed to load user information');
+        // Log the user out if fetching fails (e.g., due to expired token)
+        ApiService.logout();
+        window.location.href = '/login';  // Redirect to login page
       } finally {
         setLoading(false);
       }
@@ -39,9 +42,23 @@ const ProfilePage = () => {
     setAddress((prevAddress) => ({ ...prevAddress, [name]: value }));
   };
 
+  // Validate address form
+  const validateAddress = () => {
+    const { street, city, province, zipCode, country } = address;
+    if (!street || !city || !province || !zipCode || !country) {
+      setAddressError("All fields are required.");
+      return false;
+    }
+    setAddressError(null);  // Clear any previous errors
+    return true;
+  };
+
   // Save address to the server
   const handleSaveAddress = async (e) => {
     e.preventDefault();
+    if (!validateAddress()) {
+      return; // Stop if validation fails
+    }
     setAddressLoading(true);
     setAddressError(null);
     
@@ -56,11 +73,13 @@ const ProfilePage = () => {
     }
   };
 
+  // Logout
   const handleLogout = () => {
     ApiService.logout();  // Call logout API method
-    window.location.href = '/login';  // Redirect to login page
+    //window.location.href = '/login';  // Redirect to login page
   };
 
+  // Loading and error handling
   if (loading) {
     return <div>Loading...</div>;
   }

@@ -25,21 +25,38 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
-        httpSecurity.csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(request -> request
-                		//might add later whenwe add admin page
-                		.requestMatchers("/admin/**").hasRole("ADMIN") 
-                        .requestMatchers("/auth/**", "/category/**", "/product/**", "/order/**", "/api/users/**", "/catalog/**", "/items/**", "/orders/**", "/hot-deals/**", "/address/**", "/api/wishlist/**", "/api/sales/**", "/api/usage/**", "/api/visit/**", "/categories/**", "/usage/**").permitAll()
-                        .anyRequest().authenticated())
-                .sessionManagement(manager-> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+            .csrf(AbstractHttpConfigurer::disable)
+            //.cors(Customizer.withDefaults())
+            .cors(AbstractHttpConfigurer::disable)
+
+            .authorizeHttpRequests(request -> request
+                // Admin routes
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                
+                // Public routes
+                .requestMatchers(
+                    "/auth/**", "/category/**", "/product/**", "/order/**", 
+                    "/api/users/**", "/catalog/**", "/items/**", "/orders/**", 
+                    "/hot-deals/**", "/address/**", "/api/wishlist/**", "/api/sales/**", 
+                    "/api/usage/**", "/api/visit/**", "/categories/**", "/usage/**","/user/my-info",
+                    "/catalog/items/upload").permitAll()
+
+                // ✅ Allow access to /user/my-info only for authenticated users
+                //.requestMatchers("/user/my-info").authenticated()
+
+                // All other requests require authentication
+                .anyRequest().authenticated()
+            )
+            .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
         return httpSecurity.build();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
