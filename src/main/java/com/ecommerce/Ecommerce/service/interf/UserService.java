@@ -11,5 +11,6 @@ public interface UserService {
     Response loginUser(LoginRequest loginRequest);
     Response getAllUsers();
     User getLoginUser();
-    Response getUserInfoAndOrderHistory();
+   
+	Response getUserInfoAndOrderHistory(Long userId);
 }

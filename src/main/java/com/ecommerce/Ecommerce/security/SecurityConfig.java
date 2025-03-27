@@ -40,7 +40,7 @@ public class SecurityConfig {
                     "/auth/**", "/category/**", "/product/**", "/order/**", 
                     "/api/users/**", "/catalog/**", "/items/**", "/orders/**", 
                     "/hot-deals/**", "/address/**", "/wishlist/**", "/api/sales/**", 
-                    "/api/usage/**", "/api/visit/**", "/categories/**", "/usage/**","/user/my-info",
+                    "/api/usage/**", "/api/visit/**", "/categories/**", "/usage/**","/user/my-info/**",
                     "/catalog/items/upload").permitAll()
 
                 //  Allow access to /user/my-info only for authenticated users

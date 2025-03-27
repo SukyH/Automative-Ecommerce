@@ -8,6 +8,7 @@ const Navigation = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [userId, setUserId] = useState(null);
 
   const navigate = useNavigate();
 
@@ -29,8 +30,10 @@ const Navigation = () => {
     const checkLoginStatus = () => {
       const token = localStorage.getItem("token");
       const userRole = localStorage.getItem("userRole");
+      const userId = localStorage.getItem("userId");
       setIsLoggedIn(!!token);
       setIsAdmin(userRole === "ADMIN");
+      setUserId(userId);
     };
 
     checkLoginStatus();
@@ -81,9 +84,10 @@ const Navigation = () => {
 
           {isLoggedIn ? (
             <>
-              <Link to="/profile" className="nav-link">
-                <i className="fas fa-user"></i> My Account
-              </Link>
+              <Link to={`/profile/${userId}`} className="nav-link">
+            <i className="fas fa-user"></i> My Account
+               </Link>
+
               <button onClick={handleLogout} className="nav-button">
                 Sign Out
               </button>
@@ -168,9 +172,15 @@ const Navigation = () => {
                 Sign Out
               </button>
               {isAdmin && (
-                <Link to="/admin" className="mobile-nav-link">
-                  Admin Panel
+                <>
+                <Link to="/admin" className="mobile-nav-link"> Admin Panel
                 </Link>
+                 
+                 <Link to="/admin/vehicles" className="mobile-nav-link">Vehicle Management</Link>
+                 <Link to="/admin/orders" className="mobile-nav-link">Order Management</Link>
+                 <Link to="/admin/analytics" className="mobile-nav-link">Analytics</Link>
+               </>
+                
               )}
             </>
           ) : (

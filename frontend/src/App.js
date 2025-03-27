@@ -34,11 +34,11 @@ function App() {
           <Route path="/catalog" element={<CatalogPage />} />
 		  <Route path="/checkout/:orderId" element={<CheckoutPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+
           <Route path="/register" element={<RegistrationPage />} />
           <Route path="/cart" element={<ShoppingCartPage />} />
           <Route path="/cart/:orderId" element={<ShoppingCartPage />} />
-
+          <Route path="/profile/:userId" element={<ProfilePage />} />
           <Route path="/vehicle-details/:id" element={<VehicleDetailsPage />} />
           <Route path="/wishlist" element={<WishListPage />} />
 

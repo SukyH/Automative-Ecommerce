@@ -16,32 +16,7 @@ export default class ApiService {
    }
 
 
-   /* Attempt to refresh the token if it has expired (not sure to add)
-   static async refreshToken() {
-       try {
-           const refreshToken = localStorage.getItem("refreshToken");
-           if (!refreshToken) {
-               throw new Error("No refresh token available");
-           }
-
-
-           const response = await axios.post(`${this.BASE_URL}/auth/refresh`, { refreshToken });
-           const { token, refreshToken: newRefreshToken } = response.data;
-
-
-           // Update tokens in localStorage
-           localStorage.setItem("token", token);
-           localStorage.setItem("refreshToken", newRefreshToken);
-
-
-           return token;  // Return the new token
-       } catch (error) {
-           console.error("Token refresh failed:", error);
-           this.logout();  // Logout if refresh fails
-           throw error;  // Re-throw to handle it in other parts of the app
-       }
-   }*/
-
+   
    
 
    // Wishlist APIs
@@ -161,29 +136,57 @@ export default class ApiService {
    }
 
 
-   static async getLoggedInUserInfo() {
-       try {
-           const response = await axios.get(`${this.BASE_URL}/user/my-info`, {
-               headers: this.getHeader()
-           });
-           return response.data;
-       } catch (error) {
-           // If request fails due to an expired token, try refreshing the token
-           if (error.response && error.response.status === 401) {
-               try {
-                   const newToken = await this.refreshToken();
-                   // Retry the request with the new token
-                   const retryResponse = await axios.get(`${this.BASE_URL}/user/my-info`, {
-                       headers: this.getHeader()  // Automatically uses the new token
-                   });
-                   return retryResponse.data;
-               } catch (refreshError) {
-                   throw refreshError;
-               }
+       static async getUserInfo(userId) {
+           if (!userId) {
+               console.error("User ID is missing or invalid");
+               throw new Error("Invalid user ID");
            }
-           throw error;  // If the error is not token-related, just throw it
+   
+           console.log(`Fetching user info for User ID: ${userId}`);
+   
+           try {
+               const response = await axios.get(`${this.BASE_URL}/user/my-info/${userId}`, {
+                   headers: {
+                       'Content-Type': 'application/json',
+                   }
+               });
+   
+               console.log("User info retrieved successfully:", response.data);
+               return response.data;
+           } catch (error) {
+               console.error("Error fetching user info:", error.response?.data || error.message);
+               throw new Error(error.response?.data?.message || "Failed to fetch user info");
+           }
        }
-   }
+
+   
+
+
+  static async refreshToken() {
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) {
+        throw new Error("No refresh token available");
+      }
+  
+      const response = await axios.post(`${this.BASE_URL}/auth/refresh`, { refreshToken });
+      const { token, refreshToken: newRefreshToken } = response.data;
+  
+      // Update tokens in localStorage
+      localStorage.setItem("token", token);
+      localStorage.setItem("refreshToken", newRefreshToken);
+  
+      return token; // Return the new token
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+      //this.logout(); // Logout if refresh fails
+      throw error; // Re-throw to handle it in other parts of the app
+    }
+  }
+  
+  	
+
+  
   
   
 
