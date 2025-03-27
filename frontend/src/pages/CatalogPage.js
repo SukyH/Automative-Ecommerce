@@ -19,6 +19,14 @@ const CatalogPage = () => {
   const navigate = useNavigate();
   const [ipAddress, setIpAddress] = useState('');
   const [cartItems, setCartItems] = useState([]);
+  const [quantities, setQuantities] = useState({});
+
+
+  
+  <div className="hero-section">
+    <h1>Explore Our Vehicles</h1>
+    <p>Find the perfect ride that fits your lifestyle and budget</p>
+  </div>
 
   // Fetch vehicles and hot deals on load
   useEffect(() => {
@@ -190,10 +198,9 @@ const handleAddToCart = async (vehicle, isDeal = false) => {
     const orderId = createdOrder.orderID.toString();
     console.log("New order created. Order ID:", orderId);
 
-    const quantityInput = prompt("Enter quantity to add:");
-    const quantity = parseInt(quantityInput);
+	const quantity = quantities[vehicleId] || 1;
 
-    if (!quantityInput || isNaN(quantity) || quantity <= 0) {
+	if (isNaN(quantity) || quantity <= 0) {
       alert("Please enter a valid quantity.");
       return;
     }
@@ -274,8 +281,8 @@ const handleAddToCart = async (vehicle, isDeal = false) => {
   };
 
   return (
-    <div>
-      <h1>Catalog</h1>
+    <div className="catalog-page">
+      <h1 className="catalog-header">Catalog</h1>
 
       {/* Search Bar */}
       <input
@@ -323,10 +330,10 @@ const handleAddToCart = async (vehicle, isDeal = false) => {
       
   	{/* Sorting Buttons */}
   	<div className="sorting-buttons">
-    	<button onClick={() => handleSortByPrice("asc")}>Sort by Price ↑</button>
-    	<button onClick={() => handleSortByPrice("desc")}>Sort by Price ↓</button>
-    	<button onClick={() => handleSortByMileage("asc")}>Sort by Mileage ↑</button>
-    	<button onClick={() => handleSortByMileage("desc")}>Sort by Mileage ↓</button>
+    	<button className="sort-button" onClick={() => handleSortByPrice("asc")}>Sort by Price ↑</button>
+    	<button className="sort-button" onClick={() => handleSortByPrice("desc")}>Sort by Price ↓</button>
+    	<button className="sort-button"onClick={() => handleSortByMileage("asc")}>Sort by Mileage ↑</button>
+    	<button className="sort-button" onClick={() => handleSortByMileage("desc")}>Sort by Mileage ↓</button>
   	</div>
 
 	  {/* Hot Deals Section */}
@@ -348,34 +355,7 @@ const handleAddToCart = async (vehicle, isDeal = false) => {
 				  ).toFixed(2)}
 				</p>
 				<span className="deal-tag">🔥 {parseFloat(deal.discountPercentage)}% OFF!</span>
-                <div className="button-group">
-                  <button
-                    className="view-details-button"
-                    onClick={() => navigate(`/vehicle-details/${deal.item?.id}`)}
-                  >
-                    View Details
-                  </button>
-				  
-			
-                  
-                  {isItemInCart(deal.item?.id) ? (
-                    <button
-                      className="remove-from-cart-button"
-                      onClick={() => handleRemoveFromCart(deal, true)}
-                      disabled={addingToCart[deal.item?.id]}
-                      style={{ backgroundColor: '#e74c3c' }}
-                    >
-                      {addingToCart[deal.item?.id] ? "Removing..." : "Remove from Cart"}
-                    </button>
-                  ) : (
-                    <button
-                      className="add-to-cart-button"
-                      onClick={() => handleAddToCart(deal, true)}
-                      disabled={addingToCart[deal.item?.id]}
-                    >
-                      {addingToCart[deal.item?.id] ? "Adding..." : "Add to Cart"}
-                    </button>
-                  )}
+                <div className="button-group">		      
                 </div>
               </div>
             ))
@@ -414,24 +394,40 @@ const handleAddToCart = async (vehicle, isDeal = false) => {
 				  🤍 Add to Wishlist
 				</button>
                 
-                {isItemInCart(vehicle.vid) ? (
-                  <button
-                    className="remove-from-cart-button"
-                    onClick={() => handleRemoveFromCart(vehicle, false)}
-                    disabled={addingToCart[vehicle.vid]}
-                    style={{ backgroundColor: '#e74c3c' }}
-                  >
-                    {addingToCart[vehicle.vid] ? "Removing..." : "Remove from Cart"}
-                  </button>
-                ) : (
-                  <button
-                    className="add-to-cart-button"
-                    onClick={() => handleAddToCart(vehicle, false)}
-                    disabled={addingToCart[vehicle.vid]}
-                  >
-                    {addingToCart[vehicle.vid] ? "Adding..." : "Add to Cart"}
-                  </button>
-                )}
+				{isItemInCart(vehicle.vid) ? (
+				  <button
+				    className="remove-from-cart-button"
+				    onClick={() => handleRemoveFromCart(vehicle, false)}
+				    disabled={addingToCart[vehicle.vid]}
+				    style={{ backgroundColor: '#e74c3c' }}
+				  >
+				    {addingToCart[vehicle.vid] ? "Removing..." : "Remove from Cart"}
+				  </button>
+				) : (
+					<div className="add-to-cart-row">
+					  <input
+					    type="number"
+					    min="1"
+					    value={quantities[vehicle.vid] || 1}
+					    onChange={(e) =>
+					      setQuantities((prev) => ({
+					        ...prev,
+					        [vehicle.vid]: parseInt(e.target.value),
+					      }))
+					    }
+					    className="quantity-input"
+					  />
+					  <button
+					    className="add-to-cart-button"
+					    onClick={() => handleAddToCart(vehicle, false)}
+					    disabled={addingToCart[vehicle.vid]}
+					  >
+					    {addingToCart[vehicle.vid] ? "Adding..." : "Add to Cart"}
+					  </button>
+					</div>
+
+				)}
+
               </div>
             </div>
           ))

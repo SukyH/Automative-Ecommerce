@@ -18,6 +18,8 @@ const VehicleDetailsPage = () => {
   const [isInCart, setIsInCart] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+
 
   // Get IP address when component loads
   useEffect(() => {
@@ -146,75 +148,32 @@ const VehicleDetailsPage = () => {
 const handleAddToCart = async () => {
   try {
     setAddingToCart(true);
-    
-    // Get user ID if logged in
     const userId = localStorage.getItem('userId');
-    
-    // Get active order ID from localStorage if exists
-    let activeOrderId = localStorage.getItem('activeOrderId');
-    let response;
-    
-    if (activeOrderId) {
-      // Add to existing order
-      response = await ApiService.addItemToOrder(
-        activeOrderId, 
-        vehicleId, 
-        1 // Quantity
-      );
-    } else {
-      // Create new order
-      const orderData = {
-        itemId: vehicleId,
-        quantity: 1
-      };
-      
-      response = await ApiService.createOrder(userId, orderData);
-      
-      // Save the new order ID
-      if (response && response.id) {
-        localStorage.setItem('activeOrderId', response.id);
-        activeOrderId = response.id;
-      }
+
+    // Create order first
+    const createdOrder = await ApiService.createOrder(userId);
+    if (!createdOrder || !createdOrder.orderID) {
+      throw new Error("Order creation failed.");
     }
-    
-    // Handle guest cart in localStorage
-    if (!userId) {
-      const existingCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
-      
-      const newItem = {
-        id: vehicleId,
-        itemId: vehicleId,
-        model: vehicle.model,
-        name: vehicle.name || vehicle.model,
-        brand: vehicle.brand,
-        price: vehicle.price,
-        imageUrl: vehicle.imageUrl,
-        quantity: 1
-      };
-      
-      // Check if item already exists in cart
-      const existingItemIndex = existingCart.findIndex(item => item.id === vehicleId);
-      
-      if (existingItemIndex >= 0) {
-        // Update quantity if already in cart
-        existingCart[existingItemIndex].quantity += 1;
-      } else {
-        // Add new item
-        existingCart.push(newItem);
-      }
-      
-      localStorage.setItem('guestCart', JSON.stringify(existingCart));
+
+    const orderId = createdOrder.orderID.toString();
+
+    if (isNaN(quantity) || quantity <= 0) {
+      alert("Please enter a valid quantity.");
+      return;
     }
-    
-    // Track the cart event
+
+    await ApiService.addItemToOrder(orderId, vehicleId, quantity);
+
     if (ipAddress && vehicleId) {
       ApiService.trackVisit(ipAddress, vehicleId, 'CART');
     }
-    
-    // Show success message
+
     alert("Vehicle added to cart successfully!");
     setIsInCart(true);
+    localStorage.setItem('activeOrderId', orderId);
     await fetchCartItems();
+
   } catch (error) {
     console.error("Error adding to cart:", error);
     alert("Failed to add vehicle to cart. Please try again.");
@@ -222,6 +181,7 @@ const handleAddToCart = async () => {
     setAddingToCart(false);
   }
 };
+
 
 // Remove from Cart functionality
 const handleRemoveFromCart = async () => {
@@ -272,42 +232,55 @@ const handleRemoveFromCart = async () => {
   if (!vehicle) return <p>Loading...</p>; // Show loading if vehicle data is not yet loaded
 
   return (
-    <div>
+      <div className="vehicle-details-page">
       <h1>{vehicle.name} ({vehicle.modelYear})</h1>
       <img src={vehicle.imageUrl} alt={vehicle.model} />
+	  <div className="vehicle-specs">
       <p><strong>Brand:</strong> {vehicle.brand}</p>
       <p><strong>Description:</strong> {vehicle.description}</p>
       <p><strong>Mileage:</strong> {vehicle.mileage} miles</p>
       <p><strong>Shape:</strong> {vehicle.shape}</p>
       <p><strong>Vehicle History:</strong> {vehicle.vehicleHistory}</p>
       <p><strong>Price:</strong> ${vehicle.price.toLocaleString()}</p> {/* Price formatted as currency */}
+	  </div>
        
 
        {/* Cart Action Buttons */}
       <div className="cart-actions">
-        {isInCart ? (
-          <button
-            className="remove-from-cart-button"
-            onClick={handleRemoveFromCart}
-            disabled={addingToCart}
-            style={{ backgroundColor: '#e74c3c', color: 'white', padding: '10px 15px', margin: '10px 0', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-          >
-            {addingToCart ? "Removing..." : "Remove from Cart"}
-          </button>
-        ) : (
-          <button
-            className="add-to-cart-button"
-            onClick={handleAddToCart}
-            disabled={addingToCart}
-            style={{ backgroundColor: '#2ecc71', color: 'white', padding: '10px 15px', margin: '10px 0', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-          >
-            {addingToCart ? "Adding..." : "Add to Cart"}
-          </button>
-        )}
-      </div>
+	  <div className="cart-actions add-to-cart-row">
+	    <input
+	      type="number"
+	      min="1"
+	      value={quantity}
+	      onChange={(e) => setQuantity(parseInt(e.target.value))}
+	      className="quantity-input"
+	    />
+	    
+	    {isInCart ? (
+	      <button
+	        className="remove-from-cart-button"
+	        onClick={handleRemoveFromCart}
+	        disabled={addingToCart}
+	        style={{ backgroundColor: '#e74c3c' }}
+	      >
+	        {addingToCart ? "Removing..." : "Remove from Cart"}
+	      </button>
+	    ) : (
+	      <button
+	        className="add-to-cart-button"
+	        onClick={handleAddToCart}
+	        disabled={addingToCart}
+	        style={{ backgroundColor: '#2ecc71' }}
+	      >
+	        {addingToCart ? "Adding..." : "Add to Cart"}
+	      </button>
+	    )}
+	  </div>
+	  </div>
+
 
       {/* Loan Calculator Section */}
-      <div>
+	  <div className="loan-calculator">
         <h3>Loan Calculator</h3>
         <label>Loan Amount: ${loanAmount}</label>
         <br />
@@ -337,7 +310,7 @@ const handleRemoveFromCart = async () => {
       </div>
 
       {/* Reviews Section */}
-      <div>
+		<div className="reviews-section">
         <h3>Reviews</h3>
         {Array.isArray(reviews) && reviews.length === 0 ? (
           <p>No reviews yet...</p>

@@ -27,7 +27,7 @@ const AnalyticsPage = () => {
         const usageResponse = await ApiService.getApplicationUsageReport();
         const salesResponse = await ApiService.getSalesReport();
         setUsageReport(usageResponse.data);
-        setSalesReport(salesResponse.data);
+        setSalesReport(salesResponse);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching reports:', err);
