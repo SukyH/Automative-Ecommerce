@@ -242,6 +242,10 @@ const handleRemoveFromCart = async () => {
       <p><strong>Shape:</strong> {vehicle.shape}</p>
       <p><strong>Vehicle History:</strong> {vehicle.vehicleHistory}</p>
       <p><strong>Price:</strong> ${vehicle.price.toLocaleString()}</p> {/* Price formatted as currency */}
+	  <p><strong>Interior Color:</strong> {vehicle.interiorColor}</p>
+	  <p><strong>Exterior Color:</strong> {vehicle.exteriorColor}</p>
+	  <p><strong>Fabric:</strong> {vehicle.fabric}</p>
+
 	  </div>
        
 

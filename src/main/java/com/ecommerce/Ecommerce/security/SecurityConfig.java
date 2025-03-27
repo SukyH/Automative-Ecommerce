@@ -39,11 +39,11 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/auth/**", "/category/**", "/product/**", "/order/**", 
                     "/api/users/**", "/catalog/**", "/items/**", "/orders/**", 
-                    "/hot-deals/**", "/address/**", "/api/wishlist/**", "/api/sales/**", 
+                    "/hot-deals/**", "/address/**", "/wishlist/**", "/api/sales/**", 
                     "/api/usage/**", "/api/visit/**", "/categories/**", "/usage/**","/user/my-info",
                     "/catalog/items/upload").permitAll()
 
-                // ✅ Allow access to /user/my-info only for authenticated users
+                //  Allow access to /user/my-info only for authenticated users
                 //.requestMatchers("/user/my-info").authenticated()
 
                 // All other requests require authentication
