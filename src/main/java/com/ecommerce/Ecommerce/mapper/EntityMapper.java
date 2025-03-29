@@ -22,6 +22,7 @@ public interface EntityMapper {
     UserDto userToUserDto(User user);
     User userDtoToUser(UserDto userDto);
     
+    @Mapping(target = "address.user", ignore = true)
     UserDto fullUserToUserDto(User user);
 
  // Basic Address to AddressDto Mapping (Avoids Circular Dependency)
@@ -29,6 +30,7 @@ public interface EntityMapper {
     AddressDto addressToAddressDto(Address address);
 
     // Full Address to AddressDto Mapping
+    @Mapping(target = "user.address", ignore = true)
     AddressDto fullAddressToAddressDto(Address address);
 
     // Convert AddressDto back to Address
