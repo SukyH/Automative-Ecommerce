@@ -1,151 +1,78 @@
-import React, { useEffect, useState } from 'react';
-import ApiService from '../service/ApiService'; 
+import React, { useState, useEffect } from 'react';
+import ApiService from '../service/ApiService';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [address, setAddress] = useState({
-    street: '',
-    city: '',
-    province: '',
-    zipCode: '',
-    country: '',
-  });
-  const [addressLoading, setAddressLoading] = useState(false);
-  const [addressError, setAddressError] = useState(null);
+    const [userInfo, setUserInfo] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  // Fetch user data
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userData = await ApiService.getLoggedInUserInfo();
-        setUser(userData);
-        setAddress(userData.address || { street: '', city: '', province: '', zipCode: '', country: '' });
-      } catch (err) {
-        console.error("Error fetching user data:", err);
-        setError('Failed to load user information');
-        // Log the user out if fetching fails (e.g., due to expired token)
-        ApiService.logout();
-        window.location.href = '/login';  // Redirect to login page
-      } finally {
-        setLoading(false);
-      }
-    };
+    const { userId } = useParams();  // If you use React Router to pass userId via URL
+    const navigate = useNavigate();
 
-    fetchUserData();
-  }, []);
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            const storedUserId = localStorage.getItem('userId');  // Retrieve from localStorage if not passed via URL
 
-  // Handle address input change
-  const handleAddressChange = (e) => {
-    const { name, value } = e.target;
-    setAddress((prevAddress) => ({ ...prevAddress, [name]: value }));
-  };
+            if (!storedUserId && !userId) {
+                setError("User is not logged in.");
+                setLoading(false);
+                return;
+            }
 
-  // Validate address form
-  const validateAddress = () => {
-    const { street, city, province, zipCode, country } = address;
-    if (!street || !city || !province || !zipCode || !country) {
-      setAddressError("All fields are required.");
-      return false;
+            const idToUse = userId || storedUserId;
+
+            try {
+                const data = await ApiService.getUserInfo(idToUse);  // Fetch user info using API service
+                setUserInfo(data);
+                setLoading(false);
+            } catch (err) {
+                setError("Failed to load user info.");
+                setLoading(false);
+            }
+        };
+
+        fetchUserInfo();
+    }, [userId]);  // Run when userId changes (if passed in URL)
+
+   
+
+    if (loading) {
+        return <div>Loading user information...</div>;
     }
-    setAddressError(null);  // Clear any previous errors
-    return true;
-  };
 
-  // Save address to the server
-  const handleSaveAddress = async (e) => {
-    e.preventDefault();
-    if (!validateAddress()) {
-      return; // Stop if validation fails
+    if (error) {
+        return <div className="error-message">{error}</div>;
     }
-    setAddressLoading(true);
-    setAddressError(null);
-    
-    try {
-      const response = await ApiService.saveAddress(address);  // Call saveAddress API
-      alert(response.message || 'Address saved successfully!');
-    } catch (err) {
-      console.error("Error saving address:", err);
-      setAddressError('Failed to save address');
-    } finally {
-      setAddressLoading(false);
-    }
-  };
 
-  // Logout
-  const handleLogout = () => {
-    ApiService.logout();  // Call logout API method
-    //window.location.href = '/login';  // Redirect to login page
-  };
-
-  // Loading and error handling
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div className="error-text">{error}</div>;
-  }
-
-  return (
-    <div>
-      <h1>Profile</h1>
-      {user ? (
-        <>
-          <p><strong>Name:</strong> {user.name}</p>
-          <p><strong>Email:</strong> {user.email}</p>
-
-          <h2>Address</h2>
-          <form onSubmit={handleSaveAddress}>
-            <input
-              type="text"
-              name="street"
-              value={address.street}
-              onChange={handleAddressChange}
-              placeholder="Street"
-            />
-            <input
-              type="text"
-              name="city"
-              value={address.city}
-              onChange={handleAddressChange}
-              placeholder="City"
-            />
-            <input
-              type="text"
-              name="province"
-              value={address.province}
-              onChange={handleAddressChange}
-              placeholder="Province/State"
-            />
-            <input
-              type="text"
-              name="zipCode"
-              value={address.zipCode}
-              onChange={handleAddressChange}
-              placeholder="Zip Code"
-            />
-            <input
-              type="text"
-              name="country"
-              value={address.country}
-              onChange={handleAddressChange}
-              placeholder="Country"
-            />
-            <button type="submit" disabled={addressLoading}>
-              {addressLoading ? 'Saving...' : 'Save Address'}
-            </button>
-          </form>
-          {addressError && <p className="error-text">{addressError}</p>}
-
-          <button onClick={handleLogout}>Log Out</button>
-        </>
-      ) : (
-        <p>No user data available</p>
-      )}
-    </div>
-  );
+    return (
+        <div className="profile-container">
+            <h1>User Profile</h1>
+            {userInfo && (
+                <div className="profile-details">
+                    <h2>{userInfo.user.name}</h2>
+                    <p><strong>Email:</strong> {userInfo.user.email}</p>
+                    <p><strong>Phone:</strong> {userInfo.user.phoneNumber}</p>
+                    <p><strong>Role:</strong> {userInfo.user.role}</p>
+                    <div className="order-history">
+                        <h3>Order History:</h3>
+                        <ul>
+                            {userInfo.user.orderItemList && userInfo.user.orderItemList.length > 0 ? (
+                                userInfo.user.orderItemList.map((orderItem, index) => (
+                                    <li key={index}>
+                                        {orderItem.name} - ${orderItem.price?.toFixed(2)} x {orderItem.quantity}
+                                    </li>
+                                ))
+                            ) : (
+                                <p>No past orders found.</p>
+                            )}
+                        </ul>
+                    </div>
+               
+                </div>
+            )}
+        </div>
+    );
 };
 
 export default ProfilePage;

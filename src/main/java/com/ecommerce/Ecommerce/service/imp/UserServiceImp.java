@@ -130,17 +130,16 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public Response getUserInfoAndOrderHistory() {
-        User user = getLoginUser(); 
-        if (user == null) {
-            throw new RuntimeException("User not found or unauthorized");
-        }
-
+    public Response getUserInfoAndOrderHistory(Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found or unauthorized"));
+        
         UserDto userDto = entityMapper.mapUserToDtoPlusAddressAndOrderHistory(user);
         return Response.builder()
                 .status(200)
                 .user(userDto)
                 .build();
     }
+
 
 }

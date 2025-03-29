@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ApiService from '../service/ApiService';
-
+import { Link } from "react-router-dom"; // Add this import
 const HomePage = () => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -111,9 +111,11 @@ const HomePage = () => {
           }}>
             Explore our latest electric vehicles and unbeatable deals
           </p>
-          <button style={{...styles.button, marginTop: "2rem", fontSize: "1.25rem", padding: "1rem 2rem"}}>
-            Shop Now
-          </button>
+          <Link to="/catalog">
+    <button style={{ ...styles.button, marginTop: "2rem", fontSize: "1.25rem", padding: "1rem 2rem" }}>
+      Shop Now
+    </button>
+     </Link>
         </div>
       </div>
 
