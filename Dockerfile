@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk-slim
+FROM openjdk:23-jdk-slim
 
 # Install curl
 RUN apt-get update && apt-get install -y curl
