@@ -3,7 +3,7 @@ import axios from "axios";
 
 export default class ApiService {
    // Change it according to wherever your backend is running
-   static BASE_URL = "http://localhost:8080";
+   static BASE_URL = "https://automative-ecommerce-bus4.onrender.com";
 
 
    // Get header with the token
