@@ -8,7 +8,7 @@ WORKDIR /app
 
 
 # Download the JAR file from GitHub Releases
-RUN curl -L -o ecommerce.jar https://github.com/SukyH/Automative-Ecommerce/releases/download/v1.0/Ecommerce-0.0.1-SNAPSHOT.jar
+RUN curl -L -o ecommerce.jar https://github.com/SukyH/Automative-Ecommerce/releases/download/v2.0/Ecommerce-0.0.1-SNAPSHOT.jar
 
 EXPOSE 8080
 
