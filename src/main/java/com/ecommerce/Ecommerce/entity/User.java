@@ -51,7 +51,7 @@ public class User {
 	
 	
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL,mappedBy = "user")
-	private Address Address;
+	private Address address;
 
 	
     @CreationTimestamp

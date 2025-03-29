@@ -23,16 +23,15 @@ public class JwtUtils {
     private static final long EXPIRATION_TIME_IN_MILLISEC = 1000L * 60L * 60L * 6L; // 6 hours
     private SecretKey key;
 
-    private String secretJwtString; 
+
+
+    @Value("${SECRET_JWT_KEY}")
+    private String secretJwtString;
 
     @PostConstruct
     private void init() {
-        // Load the secret key from environment variable and change if needed?
-        this.secretJwtString = System.getenv("SECRET_JWT_KEY"); // Ensure this matches the .env file
-
-
         if (this.secretJwtString == null || this.secretJwtString.isEmpty()) {
-            throw new IllegalStateException("SECRET_JWT_KEY environment variable is not set");
+            throw new IllegalStateException("SECRET_JWT_KEY is not configured");
         }
 
         byte[] keyBytes = secretJwtString.getBytes(StandardCharsets.UTF_8);
