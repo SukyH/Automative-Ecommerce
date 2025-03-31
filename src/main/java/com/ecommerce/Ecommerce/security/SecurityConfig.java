@@ -27,9 +27,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-            .csrf(AbstractHttpConfigurer::disable)
-            //.cors(Customizer.withDefaults())
-            .cors(AbstractHttpConfigurer::disable)
+            //.csrf(AbstractHttpConfigurer::disable)
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // CSRF token in cookies
+            )
+            .cors(Customizer.withDefaults())
+            //.cors(AbstractHttpConfigurer::disable)
 
             .authorizeHttpRequests(request -> request
                 // Admin routes
