@@ -165,7 +165,7 @@ Hosting Information:
 
 The backend is hosted on Render's free-tier hosting, so the first request after deployment might take up to two minutes to "wake up" as the container spins up. Please be patient during the initial request.
 
-This should cover everything clearly and concisely. Let me know if you'd like further adjustments!
+
 
 
 
